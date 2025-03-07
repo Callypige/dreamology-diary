@@ -18,7 +18,6 @@ const getDreams = async () => {
     }
 };
 
-
 export default async function DreamList() {
     const { body: dreams } = await getDreams();
 
@@ -29,17 +28,20 @@ export default async function DreamList() {
             </h1>
 
             {dreams.length > 0 ? (
-                <div className="flex flex-wrap justify-center gap-8">
+                <div className="flex flex-wrap gap-6 justify-center">
                     {dreams.map((dream) => (
                         <div
                             key={dream._id}
-                            className="w-full md:w-3/5 lg:w-2/5 xl:w-1/3 bg-slate-900 shadow-xl rounded-2xl p-8 border border-slate-700 transition-all duration-300 hover:shadow-2xl hover:scale-105"
+                            className="bg-slate-900 shadow-xl rounded-2xl p-8 border border-slate-700 transition-all duration-300 hover:shadow-2xl hover:scale-105 md:w-[30%] lg:w-[30%] w-full"
                         >
                             <h2 className="text-3xl font-bold text-white mb-4">{dream.title}</h2>
                             <p className="text-gray-300 text-lg leading-relaxed">{dream.description}</p>
                             <div className="flex justify-end gap-6 mt-6">
-                                <RemoveBtn id={dream._id}/>
-                                <Link href={`/editDream/${dream._id}`} className="text-blue-400 hover:text-blue-500 transition">
+                                <RemoveBtn id={dream._id} />
+                                <Link
+                                    href={`/editDream/${dream._id}`}
+                                    className="text-blue-400 hover:text-blue-500 transition"
+                                >
                                     <HiPencilAlt size={32} />
                                 </Link>
                             </div>
