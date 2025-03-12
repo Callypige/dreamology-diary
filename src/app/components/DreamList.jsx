@@ -34,7 +34,11 @@ export default async function DreamList() {
                             key={dream._id}
                             className="bg-slate-900 shadow-xl rounded-2xl p-8 border border-slate-700 transition-all duration-300 hover:shadow-2xl hover:scale-105 md:w-[30%] lg:w-[30%] w-full"
                         >
-                            <h2 className="text-3xl font-bold text-white mb-4">{dream.title}</h2>
+                            <Link href={`/viewDream/${dream._id}`}>
+                                <h2 className="text-3xl font-bold text-white mb-4 hover:text-blue-400 transition cursor-pointer">
+                                    {dream.title}
+                                </h2>
+                            </Link>
                             <p className="text-gray-300 text-lg leading-relaxed">{dream.description}</p>
                             <div className="flex justify-end gap-6 mt-6">
                                 <RemoveBtn id={dream._id} />
