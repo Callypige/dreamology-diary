@@ -18,7 +18,8 @@ const getDreamById = async (id) => {
 };
 
 export default async function DreamDetails({ params }) {
-    const { dream } = await getDreamById(params.id);
+    const { id } = await params
+    const { dream } = await getDreamById(id);
 
     if (!dream) {
         return (
