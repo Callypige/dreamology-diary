@@ -13,28 +13,38 @@ const UserButton = () => {
   }
 
   return (
-    <nav className="p-4 flex justify-end">
+    <div className="flex items-center gap-4">
       {session ? (
-        <div className="flex items-center gap-4">
-          <span className="text-white">👤 {session.user?.name || session.user?.email}</span>
+        <>
+          <span className="text-sm text-white">
+            👤 {session.user?.name || session.user?.email}
+          </span>
           <button
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-            onClick={() => signOut({ redirect: false }).then(() => router.push("/"))}
+            onClick={() =>
+              signOut({ redirect: false }).then(() => router.push("/"))
+            }
+            className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition"
           >
             Déconnexion
           </button>
-        </div>
+        </>
       ) : (
-        <div className="flex gap-4">
-          <Link href="/sign-in" className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+        <>
+          <Link
+            href="/signin"
+            className="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition"
+          >
             Se connecter
           </Link>
-          <Link href="/sign-up" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+          <Link
+            href="/signup"
+            className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition"
+          >
             S'inscrire
           </Link>
-        </div>
+        </>
       )}
-    </nav>
+    </div>
   );
 };
 
