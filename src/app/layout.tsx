@@ -28,7 +28,7 @@ export default function RootLayout({
 
         <SessionWrapper>
             <Navbar />
-          <main className="max-w-6xl mx-auto px-6 py-28">{children}</main>
+            <main className="max-w-6xl mx-auto px-6 py-28">{children}</main>
           </SessionWrapper>
       </body>
     </html>

@@ -68,10 +68,12 @@ export const authOptions: AuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user = {
+          ...session.user,
+          id: token.id as string,     
           email: token.email,
           name: token.name,
           image: token.picture,
-        };
+        } as typeof session.user & { id: string };;
       }
       return session;
     },
