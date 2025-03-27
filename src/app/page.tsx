@@ -13,7 +13,6 @@ export default async function Home() {
           <h1 className="text-4xl font-bold mb-4">
             Bienvenue, {session.user?.name || session.user?.email || "Utilisateur"} !
           </h1>
-          <p className="text-lg mb-6">Voici la liste de vos rêves :</p>
           <DreamList />
         </>
       ) : (
@@ -24,7 +23,7 @@ export default async function Home() {
             <Link href="/sign-in" className="px-6 py-3 bg-indigo-600 rounded-md hover:bg-indigo-700 transition">
               Se connecter
             </Link>
-            <Link href="/sign-up" className="px-6 py-3 bg-green-600 rounded-md hover:bg-green-700 transition">
+            <Link href="/signup" className="px-6 py-3 bg-green-600 rounded-md hover:bg-green-700 transition">
               S'inscrire
             </Link>
           </div>

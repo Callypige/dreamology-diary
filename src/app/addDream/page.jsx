@@ -20,7 +20,10 @@ export default function AddDream() {
 
         try {
             const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3007";
-            const request = await fetch(`${baseUrl}/api/dreams`, { cache: "no-cache" });
+            const request = await fetch(`${baseUrl}/api/dreams`, {
+                cache: "no-cache",
+                credentials: "include", 
+              });
             await fetch(`${baseUrl}/api/dreams`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

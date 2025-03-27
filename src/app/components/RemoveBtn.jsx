@@ -11,6 +11,7 @@ export default function RemoveBtn({ id }) {
             const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:300";
             const request = await fetch(`${baseUrl}/api/dreams?id=${id}`, { 
                 method: "DELETE",
+                credentials: "include", 
             });
 
             if (request.ok) {

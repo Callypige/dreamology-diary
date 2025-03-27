@@ -5,7 +5,7 @@ import EditDreamForm from "@/app/components/EditDreamForm";
 const getDreamById = async (id) => {
         try {
             const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-            const request = await fetch(`${baseUrl}/api/dreams/${id}`, { cache: "no-store" });
+            const request = await fetch(`${baseUrl}/api/dreams/${id}`, { cache: "no-store", credentials: "include" });
 
             if (!request.ok) {
                 throw new Error(`HTTP error! Status: ${request.status}`);

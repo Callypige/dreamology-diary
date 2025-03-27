@@ -17,6 +17,7 @@ export default function EditDreamForm({ id, title, description }) {
             headers: {
                 "Content-Type": "application/json",
             },
+            credentials: "include", 
             body: JSON.stringify({ newTitle, newDescription }),
         });
 

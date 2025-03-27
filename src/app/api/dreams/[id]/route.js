@@ -12,8 +12,20 @@ export async function PUT(request, { params }) {
 }
 
 export async function GET(request, { params }) {
+    // Get session user connected
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params
     await connectMongoDB();
-    const dream = await Dream.findOne({ _id: id });
+    const dream = await Dream.findOne({ _id: id,  user: session.user.id });
+
+    if (!dream) {
+        return NextResponse.json({ error: "Dream not found or access denied" }, { status: 404 });
+      }
+      
     return NextResponse.json({ dream }, { status: 200 });
   }

@@ -44,6 +44,7 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
+    // Connexion to Github
     async signIn({ account, profile }) {
       if (account?.provider === "github") {
         await connectToDatabase();
