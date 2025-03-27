@@ -74,7 +74,6 @@ const SignIn = () => {
           </button>
         </form>
 
-        {/* Boutons d'authentification sociale */}
         <div className="flex justify-center gap-4 mt-6">
           <button
             onClick={() => handleProviderSignIn("github")}

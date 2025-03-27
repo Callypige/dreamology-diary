@@ -8,6 +8,7 @@ import { FaGithub } from "react-icons/fa";
 
 const SignUp = () => {
   const [form, setForm] = useState({
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -31,7 +32,12 @@ const SignUp = () => {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: form.email, password: form.password }),
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        confirmPassword: form.confirmPassword, 
+      }),
     });
 
     const data = await res.json();
@@ -61,6 +67,15 @@ const SignUp = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-3 mt-4">
+          <input
+            type="text"
+            placeholder="Pseudo"
+            disabled={loading}
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full p-3 rounded bg-slate-700 text-white placeholder-gray-400 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          />
           <input
             type="email"
             placeholder="Email"
