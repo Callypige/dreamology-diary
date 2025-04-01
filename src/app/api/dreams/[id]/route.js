@@ -38,7 +38,7 @@ export async function GET(request, { params }) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = params;
+  const { id } = await params
   await connectMongoDB();
 
   const dream = await Dream.findOne({ _id: id, user: session.user.id });

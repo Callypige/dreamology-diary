@@ -1,50 +1,110 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { TbArrowBackUp } from "react-icons/tb";
+import { useParams } from "next/navigation";
 
-const getDreamById = async (id) => {
-    try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3007";
-        const response = await fetch(`${baseUrl}/api/dreams/${id}`, { cache: "no-cache" });
+export default function DreamDetails() {
+  const { id } = useParams();
+  const [dream, setDream] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+  useEffect(() => {
+    const fetchDream = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-        return response.json();
-    } catch (error) {
-        console.error("Error fetching dream:", error);
-        return null;
-    }
-};
+        const res = await fetch(`${baseUrl}/api/dreams/${id}`, {
+          cache: "no-cache",
+          credentials: "include",
+        });
 
-export default async function DreamDetails({ params }) {
-    const { id } = await params
-    const { dream } = await getDreamById(id);
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
 
-    if (!dream) {
-        return (
-            <section className="w-full min-h-screen bg-slate-900 flex items-center justify-center">
-                <p className="text-gray-300 text-xl">Ce rêve est introuvable...</p>
-            </section>
-        );
-    }
+        const data = await res.json();
+        setDream(data.dream);
+      } catch (err) {
+        console.error("Error fetching dream:", err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return (
-        <section className="w-full min-h-screen bg-gradient-to-r from-indigo-950 to-slate-950 flex flex-col items-center justify-center px-6">
-            <div className="bg-slate-800 shadow-2xl rounded-3xl p-12 md:p-16 lg:p-20 w-full max-w-[90%] mx-auto border border-slate-700">
-                <h1 className="text-5xl font-bold text-white mb-8 border-b border-indigo-500 pb-4">
-                    🌠 {dream.title}
-                </h1>
-                <p className="text-xl text-gray-200 leading-relaxed whitespace-pre-line">
-                    {dream.description}
-                </p>
-                <div className="mt-10 flex justify-end">
-                    <Link href="/" className="inline-flex items-center text-gray-300 hover:text-indigo-400 transition">
-                        <TbArrowBackUp size={28} className="mr-2" />
-                        Retour à la liste
-                    </Link>
-                </div>
-            </div>
-        </section>
-    );
+    if (id) fetchDream();
+  }, [id]);
+
+  if (loading) {
+    return <p className="text-center text-white mt-12">Chargement...</p>;
+  }
+
+  if (error || !dream) {
+    return <p className="text-center text-white mt-12">Ce rêve est introuvable...</p>;
+  }
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  return (
+    <section className="bg-gradient-to-r from-indigo-950 to-slate-950 min-h-screen flex justify-center py-12 px-4">
+      <div className="bg-slate-800 rounded-3xl shadow-xl border border-indigo-900 p-8 md:p-12 lg:p-16 w-full max-w-3xl">
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 border-b-2 border-indigo-500 pb-2">
+          🌠 {dream.title}
+        </h1>
+        <p className="text-gray-200 whitespace-pre-line mb-8">{dream.description}</p>
+
+        {/* Immersion */}
+        <div className="mb-6">
+          <h2 className="text-xl text-indigo-400 font-semibold border-b border-indigo-500 mb-3">🌙 Immersion</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-300">
+            <p>📅 <strong>Date :</strong> {formatDate(dream.date)}</p>
+            <p>😊 <strong>Humeur :</strong> {dream.mood || "N/A"}</p>
+            <p>🔮 <strong>Lucide :</strong> {dream.lucidity ? "Oui" : "Non"}</p>
+            <p>🔥 <strong>Intensité :</strong> {dream.intensity}/10</p>
+            <p>🔄 <strong>Récurrent :</strong> {dream.recurring ? "Oui" : "Non"}</p>
+            <p>📍 <strong>Lieu :</strong> {dream.location || "N/A"}</p>
+            <p>🧑‍🤝‍🧑 <strong>Personnages :</strong> {dream.characters?.join(", ") || "N/A"}</p>
+            <p>🔖 <strong>Tags :</strong> {dream.tags?.join(", ") || "N/A"}</p>
+            <p>💭 <strong>Interprétation :</strong> {dream.interpretation || "N/A"}</p>
+            <p>📌 <strong>Type :</strong> {dream.type}</p>
+          </div>
+        </div>
+
+        {/* Sommeil & Bien-être */}
+        <div className="mb-6">
+          <h2 className="text-xl text-indigo-400 font-semibold border-b border-indigo-500 mb-3">🧘 Sommeil & Bien-être</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-300">
+            <p>😴 <strong>Clarté :</strong> {dream.dreamClarity}/10</p>
+            <p>🌙 <strong>Humeur avant sommeil :</strong> {dream.beforeSleepMood || "N/A"}</p>
+            <p>🛌 <strong>Heure coucher :</strong> {dream.sleepTime ? formatDate(dream.sleepTime) : "N/A"}</p>
+            <p>⏰ <strong>Heure réveil :</strong> {dream.wokeUpTime ? formatDate(dream.wokeUpTime) : "N/A"}</p>
+          </div>
+        </div>
+
+        {/* Extras */}
+        <div className="mb-6">
+          <h2 className="text-xl text-indigo-400 font-semibold border-b border-indigo-500 mb-3">🎙️ Extras</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-300">
+            <p>⭐️ <strong>Note personnelle :</strong> {dream.dreamScore}/10</p>
+            <p>🔒 <strong>Privé :</strong> {dream.private ? "Oui" : "Non"}</p>
+          </div>
+        </div>
+
+        <div className="mt-8 text-right">
+          <Link href="/" className="inline-flex items-center text-gray-300 hover:text-indigo-400 transition">
+            <TbArrowBackUp size={28} className="mr-2" /> Retour à la liste
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
 }
