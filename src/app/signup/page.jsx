@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { FaGithub } from "react-icons/fa";
 
 const SignUp = () => {
   const [form, setForm] = useState({
@@ -111,17 +110,6 @@ const SignUp = () => {
             {loading ? "Inscription en cours..." : "S'inscrire"}
           </button>
         </form>
-
-        {/* Boutons d'authentification sociale */}
-        <div className="flex justify-center gap-4 mt-6">
-          <button
-            onClick={() => handleProviderSignIn("github")}
-            className="bg-white p-3 rounded-full hover:bg-gray-200 transition-all"
-          >
-            <FaGithub size={24} />
-          </button>
-        </div>
-
         <p className="text-center text-sm text-gray-400 mt-4">
           Déjà un compte ?{" "}
           <Link href="/sign-in" className="text-indigo-400 hover:underline">

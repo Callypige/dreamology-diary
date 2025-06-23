@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { FaGithub } from "react-icons/fa";
 
 const SignIn = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -31,9 +30,6 @@ const SignIn = () => {
     }
   };
 
-  const handleProviderSignIn = (provider) => {
-    signIn(provider, { callbackUrl: "/" });
-  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-900">
@@ -73,15 +69,6 @@ const SignIn = () => {
             {loading ? "Connexion en cours..." : "Se connecter"}
           </button>
         </form>
-
-        <div className="flex justify-center gap-4 mt-6">
-          <button
-            onClick={() => handleProviderSignIn("github")}
-            className="bg-white p-3 rounded-full hover:bg-gray-200 transition-all"
-          >
-            <FaGithub size={24} />
-          </button>
-        </div>
 
         <p className="text-center text-sm text-gray-400 mt-4">
           Pas encore de compte ?{" "}
