@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";  
 
 const SignUp = () => {
   const [form, setForm] = useState({
@@ -57,6 +58,28 @@ const SignUp = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-900">
       <div className="w-full max-w-md p-6 bg-slate-800 rounded-xl shadow-lg border border-slate-700">
+
+        <figure className="flex justify-center mb-4">
+          <Image
+            src="/images/cat_play_sign.png"    
+            alt="Chat qui remplit un formulaire"
+            width={140}
+            height={140}
+            className="rounded-full object-cover shadow-md"
+            priority
+          />
+          <figcaption className="sr-only">
+            Illustration by&nbsp;
+            <a
+              href="https://www.freepik.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Freepik
+            </a>
+          </figcaption>
+        </figure>
+
         <h2 className="text-center text-2xl font-bold text-white">Créer un compte</h2>
 
         {error && (
@@ -112,7 +135,7 @@ const SignUp = () => {
         </form>
         <p className="text-center text-sm text-gray-400 mt-4">
           Déjà un compte ?{" "}
-          <Link href="/sign-in" className="text-indigo-400 hover:underline">
+          <Link href="/sign-in" className="text-pink-700 hover:underline">
             Se connecter
           </Link>
         </p>

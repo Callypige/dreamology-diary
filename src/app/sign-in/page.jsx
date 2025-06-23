@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 
 const SignIn = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -34,6 +35,20 @@ const SignIn = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-900">
       <div className="w-full max-w-md p-6 bg-slate-800 rounded-xl shadow-lg border border-slate-700">
+
+          <figure className="flex justify-center mb-4">
+            <Image
+              src="/images/cat_sleeping_sign.jpg"     
+              alt="Chat qui signe un document"
+              width={140}                    
+              height={140}
+              className="rounded-full object-cover shadow-md"
+              priority
+            />
+            <figcaption className="sr-only">
+              Illustration by <a href="https://www.freepik.com" target="_blank" rel="noopener noreferrer">Freepik</a>
+            </figcaption>
+          </figure>
         <h2 className="text-center text-2xl font-bold text-white">Se connecter</h2>
 
         {error && (
