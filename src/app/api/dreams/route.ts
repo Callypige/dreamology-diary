@@ -4,7 +4,15 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function POST(request) {
+function toDateFromHHMM(hhmm: string | undefined) {
+  if (!hhmm) return undefined;             
+  const [h, m] = hhmm.split(":").map(Number);
+  const d = new Date();                     
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
+export async function POST(request: { json: () => any; }) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -12,10 +20,12 @@ export async function POST(request) {
   }
 
   const userId = session.user.id;
-  const { title, description } = await request.json();
+
+  const body = await request.json();
 
   await connectMongoDB();
-  await Dream.create({ title, description, user: userId });
+  await Dream.create({ ...body,sleepTime : toDateFromHHMM(body.sleepTime),
+    wokeUpTime: toDateFromHHMM(body.wokeUpTime), user: userId });
 
   return NextResponse.json(
     { message: "Dream added successfully" },
@@ -36,7 +46,7 @@ export async function GET() {
   return NextResponse.json({ body: dreams }, { status: 200 });
 }
 
-export async function DELETE(request) {
+export async function DELETE(request: { nextUrl: { searchParams: { get: (arg0: string) => any; }; }; }) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
