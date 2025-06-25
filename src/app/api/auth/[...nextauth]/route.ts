@@ -42,6 +42,7 @@ export const authOptions: AuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
         token.email = user.email;
       }
       return token;
@@ -52,8 +53,7 @@ export const authOptions: AuthOptions = {
           ...session.user,
           id: token.id as string,     
           email: token.email,
-          name: token.name,
-          image: token.picture,
+          name:  token.name as string,
         } as typeof session.user & { id: string };;
       }
       return session;

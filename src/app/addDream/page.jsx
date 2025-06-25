@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TbArrowBackUp } from "react-icons/tb";
-import { getServerSession } from "next-auth";
 
 export default function AddDream() {
   const [formData, setFormData] = useState({

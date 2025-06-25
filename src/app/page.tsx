@@ -24,7 +24,7 @@ export default async function Home() {
                 alt="Chat endormi sur un oreiller"
                 width={300}
                 height={200}
-                className="mb-6 rounded-full object-cover shadow-md"
+                className="mb-6 rounded-2xl shadow-mdd"
                 priority
               />
               <figcaption className="sr-only">
