@@ -21,15 +21,25 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-4">
-          
           {session && (
-            <Link
-              href="/addDream"
-              className="bg-pink-500 text-white px-6 py-2 rounded-full shadow-md transform hover:scale-105 transition-all duration-300"
-            >
-              + Add Dream
-            </Link>
-          )}
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/addDream"
+                  className="bg-pink-500 text-white px-6 py-2 rounded-full shadow-md
+                            hover:scale-105 transition-transform duration-300"
+                >
+                  + Add Dream
+                </Link>
+
+                <Link
+                  href="/profile"                     
+                  className="bg-indigo-500 text-white px-6 py-2 rounded-full shadow-md
+                            hover:scale-105 transition-transform duration-300"
+                >
+                  Profile
+                </Link>
+              </div>
+            )}
 
           <UserButton />
         </div>

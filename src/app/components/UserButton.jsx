@@ -17,7 +17,7 @@ const UserButton = () => {
       {session ? (
         <>
           <span className="text-sm text-white">
-            👤 {session.user?.name || session.user?.email}
+            👤 {session.user?.email}
           </span>
           <button
             onClick={() =>

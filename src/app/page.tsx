@@ -7,12 +7,24 @@ import Image from "next/image";
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
+  let profileName = null;
+
+  if (session?.user?.id) {
+    const connectMongoDB = (await import("@/libs/mongodb")).default;
+    const Profile = (await import("@/models/profile")).default;
+
+    await connectMongoDB();
+    const profile = await Profile.findOne({ user: session.user.id });
+
+    profileName = profile?.name || null;
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white">
       {session ? (
         <>
           <h1 className="text-4xl font-bold mb-4">
-            Bienvenue, {session.user?.name || session.user?.email || "Utilisateur"} !
+            Bienvenue, {profileName || session.user?.email || "Utilisateur"} !
           </h1>
           <DreamList />
         </>

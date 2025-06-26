@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server'
 import User from '@/models/user'
 import connectToDatabase from '@/libs/mongodb';
+import Profile from "@/models/profile";
 
 
 export async function POST(request: Request) {
@@ -40,6 +41,16 @@ export async function POST(request: Request) {
             password: hashedPassword,
         });
         await newUser.save();
+
+        await Profile.create({
+            user: newUser._id,
+            name: newUser.name, 
+            email: newUser.email,
+            bio: "",
+            avatarUrl: "",
+            location: "",
+        });
+
         return NextResponse.json({ message: "User created" }, { status: 201 });
 
     } catch (error) {
