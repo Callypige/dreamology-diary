@@ -33,15 +33,32 @@ export async function POST(request: { json: () => any; }) {
   );
 }
 
-export async function GET() {
+export async function GET(request: { url: string; }) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Extracting query parameters from the request URL
+  const { searchParams } = new URL(request.url);
+  const type = searchParams.get("type"); // string: "lucid,nightmare,normal"
+  const mood = searchParams.get("mood"); // string: "happy,sad,angry"
+  const tag = searchParams.get("tag"); // string: "tag1,tag2,tag3"
+  const recurring = searchParams.get("recurring"); // string: "true"/"false"
+  const dreamScore = searchParams.get("dreamScore"); // stringified number
+
   await connectMongoDB();
-  const dreams = await Dream.find({ user: session.user.id });
+
+  const filters: any = { user: session.user.id };
+
+  if (type) filters.type = type;
+  if (tag) filters.tags = { $in: [tag] };
+  if (mood) filters.mood = mood;
+  if (recurring !== null) filters.recurring = recurring === "true";
+  if (dreamScore !== null) filters.dreamScore = Number(dreamScore);
+
+  const dreams = await Dream.find(filters).sort({ createdAt: -1 });
 
   return NextResponse.json({ body: dreams }, { status: 200 });
 }

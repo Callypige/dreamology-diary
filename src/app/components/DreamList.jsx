@@ -58,7 +58,6 @@ export default function DreamList() {
       </h1>
 
       {dreams.length > 0 ? (
-        /* liste verticale -------------------------------------------------- */
         <div className="flex flex-col gap-6 w-full items-center">
           {dreams.map((dream) => (
             <div
@@ -79,8 +78,6 @@ export default function DreamList() {
               <p className="text-gray-300 leading-relaxed text-sm sm:text-base mb-4 flex-1 overflow-hidden">
                 {dream.description}
               </p>
-
-              {/* barre inférieure */}
               <div className="flex items-center justify-between mt-auto pt-2">
                 <div className="text-xs text-gray-500 leading-tight">
                   <p>
