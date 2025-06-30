@@ -5,19 +5,36 @@ import Link from "next/link";
 import { HiPencilAlt } from "react-icons/hi";
 import RemoveBtn from "@/app/components/RemoveBtn";
 import Image from "next/image";
+import { Dream } from "../../../types/Dream";
 
-export default function DreamList() {
-  const [dreams, setDreams] = useState([]);
+// Define the props for the DreamList component
+interface DreamListProps {
+  type?: string;
+  recurring?: boolean;
+  dreamScore?: number;
+}
+
+export default function DreamList({type, recurring, dreamScore}: DreamListProps) {
+  const [dreams, setDreams] = useState<Dream[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDreams = async () => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-        const res = await fetch(`${baseUrl}/api/dreams`, {
+        const params = new URLSearchParams();
+
+        // Add filters to the request if provided
+        if (type) params.append("type", type);
+        if (recurring !== undefined) params.append("recurring", String(recurring));
+        if (dreamScore !== undefined && dreamScore > 0 )
+          params.append("dreamScore", String(dreamScore));
+
+        const res = await fetch(`${baseUrl}/api/dreams?${params.toString()}`, {
           cache: "no-cache",
           credentials: "include",
         });
+
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         setDreams(data.body || []);
@@ -28,7 +45,7 @@ export default function DreamList() {
       }
     };
     fetchDreams();
-  }, []);
+  }, [type, recurring, dreamScore]);
 
   if (loading) {
     return (
