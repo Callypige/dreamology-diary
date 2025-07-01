@@ -83,7 +83,7 @@ export default function EditDreamForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-slate-900 p-6 rounded-xl border border-slate-700 text-white">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4  p-6 rounded-xl border border-slate-700 text-white">
       <input
         value={newTitle}
         onChange={(e) => setNewTitle(e.target.value)}

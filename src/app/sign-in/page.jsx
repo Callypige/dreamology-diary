@@ -33,7 +33,7 @@ const SignIn = () => {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-900">
+    <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md p-6 bg-slate-800 rounded-xl shadow-lg border border-slate-700">
 
           <figure className="flex justify-center mb-4">

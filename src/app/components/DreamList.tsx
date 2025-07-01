@@ -79,7 +79,7 @@ export default function DreamList({type, recurring, dreamScore}: DreamListProps)
           {dreams.map((dream) => (
             <div
               key={dream._id}
-              className="bg-slate-900 rounded-2xl p-6 border border-slate-700
+              className="rounded-2xl p-6 border 
                          shadow-xl hover:shadow-2xl hover:scale-[1.02]
                          transition-all duration-300 flex flex-col
                          h-60 max-w-3xl w-full overflow-hidden"

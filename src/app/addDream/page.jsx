@@ -70,7 +70,7 @@ export default function AddDream() {
         🌙 Ajouter un Nouveau Rêve
       </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-8 bg-slate-900 p-8 rounded-2xl shadow-lg border border-slate-700">
+      <form onSubmit={handleSubmit} className="space-y-8 p-8 rounded-2xl shadow-lg border border-slate-700">
         {/* 1. Informations principales */}
         <div>
           <label className={labelClass}>Titre du rêve *</label>

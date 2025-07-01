@@ -30,7 +30,7 @@ export default async function EditDream({ params }) {
         <section className="w-full max-w-4xl mx-auto pt-24 px-6 min-h-screen flex flex-col justify-center">
             <h1 className="text-4xl font-bold text-white text-center mb-8">🌙 Modifier</h1>
             
-            <div className="bg-slate-900 p-8 rounded-2xl shadow-lg border border-slate-700">
+            <div className="p-8 rounded-2xl shadow-lg border border-slate-700">
                 <EditDreamForm id={id} title={title} description={description} />
             </div>
 
