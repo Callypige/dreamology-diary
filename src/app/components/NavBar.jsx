@@ -6,7 +6,6 @@ import UserButton from "@/app/components/UserButton";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
-  console.log("Session dans Navbar:", session);
 
   return (
     <nav className="w-full fixed top-0 left-0 bg-black shadow-lg z-50">

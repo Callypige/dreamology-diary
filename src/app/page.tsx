@@ -18,12 +18,9 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white">
+    <div className="min-h-screen flex flex-col items-center justify-centertext-white">
       {session ? (
         <>
-          <h1 className="text-4xl font-bold mb-4">
-            Bienvenue, {profileName || session.user?.email || "Utilisateur"} !
-          </h1>
           <DreamFilterUI />
         </>
       ) : (

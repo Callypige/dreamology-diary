@@ -7,14 +7,13 @@ import RemoveBtn from "@/app/components/RemoveBtn";
 import Image from "next/image";
 import { Dream } from "../../../types/Dream";
 
-// Define the props for the DreamList component
 interface DreamListProps {
   type?: string;
   recurring?: boolean;
   dreamScore?: number;
 }
 
-export default function DreamList({type, recurring, dreamScore}: DreamListProps) {
+export default function DreamList({ type, recurring, dreamScore }: DreamListProps) {
   const [dreams, setDreams] = useState<Dream[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,8 +26,9 @@ export default function DreamList({type, recurring, dreamScore}: DreamListProps)
         // Add filters to the request if provided
         if (type) params.append("type", type);
         if (recurring !== undefined) params.append("recurring", String(recurring));
-        if (dreamScore !== undefined && dreamScore > 0 )
+        if (dreamScore !== undefined && dreamScore > 0) {
           params.append("dreamScore", String(dreamScore));
+        }
 
         const res = await fetch(`${baseUrl}/api/dreams?${params.toString()}`, {
           cache: "no-cache",
@@ -51,26 +51,23 @@ export default function DreamList({type, recurring, dreamScore}: DreamListProps)
     return (
       <>
         <figure className="flex justify-center mb-8">
-            <Image
-              src="/images/doggy.jpg"
-              alt="Chien qui dort paisiblement"
-              width={220}
-              height={220}
-              className="rounded-full object-cover shadow-lg"
-              priority
-            />
-          </figure>
-        <p className="text-center text-white mt-12">
-          Chargement des rêves…
-        </p>
+          <Image
+            src="/images/doggy.jpg"
+            alt="Chien qui dort paisiblement"
+            width={220}
+            height={220}
+            className="rounded-full object-cover shadow-lg"
+            priority
+          />
+        </figure>
+        <p className="text-center text-white mt-12">Chargement des rêves…</p>
       </>
     );
   }
 
-  /* ---------------------------------------------------------------------- */
   return (
-    <section className="w-full px-8 py-12 bg-gradient-to-b from-slate-800 to-slate-950 min-h-screen">
-      <h1 className="text-5xl font-extrabold text-white text-center tracking-wide mb-12 drop-shadow-lg">
+    <section className="w-full px-8 py-12 min-h-screen">
+      <h1 className="text-3xl font-bold text-white text-center tracking-wide mb-8 drop-shadow-lg">
         ✨ Mes Rêves ✨
       </h1>
 
@@ -79,15 +76,13 @@ export default function DreamList({type, recurring, dreamScore}: DreamListProps)
           {dreams.map((dream) => (
             <div
               key={dream._id}
-              className="rounded-2xl p-6 border 
-                         shadow-xl hover:shadow-2xl hover:scale-[1.02]
+              className="bg-slate-800 border border-slate-600 rounded-2xl p-6 shadow-lg
+                         hover:shadow-2xl hover:scale-[1.02] hover:ring-1 hover:ring-indigo-500/40
                          transition-all duration-300 flex flex-col
                          h-60 max-w-3xl w-full overflow-hidden"
             >
               <Link href={`/viewDream/${dream._id}`}>
-                <h2 className="text-2xl font-bold text-white mb-2
-                               hover:text-blue-400 transition cursor-pointer
-                               line-clamp-1">
+                <h2 className="text-2xl font-bold text-white mb-2 hover:text-indigo-400 transition cursor-pointer line-clamp-1">
                   {dream.title}
                 </h2>
               </Link>
@@ -95,23 +90,18 @@ export default function DreamList({type, recurring, dreamScore}: DreamListProps)
               <p className="text-gray-300 leading-relaxed text-sm sm:text-base mb-4 flex-1 overflow-hidden">
                 {dream.description}
               </p>
+
               <div className="flex items-center justify-between mt-auto pt-2">
-                <div className="text-xs text-gray-500 leading-tight">
-                  <p>
-                    Créé&nbsp;:{" "}
-                    {new Date(dream.createdAt).toLocaleDateString("fr-FR")}
-                  </p>
-                  <p>
-                    Modifié&nbsp;:{" "}
-                    {new Date(dream.updatedAt).toLocaleDateString("fr-FR")}
-                  </p>
+                <div className="text-xs text-gray-400 leading-tight">
+                  <p>Créé : {new Date(dream.createdAt).toLocaleDateString("fr-FR")}</p>
+                  <p>Modifié : {new Date(dream.updatedAt).toLocaleDateString("fr-FR")}</p>
                 </div>
 
                 <div className="flex gap-4 items-center">
                   <RemoveBtn id={dream._id} />
                   <Link
                     href={`/editDream/${dream._id}`}
-                    className="text-blue-400 hover:text-blue-500 transition"
+                    className="text-indigo-400 hover:text-indigo-500 transition"
                   >
                     <HiPencilAlt size={28} />
                   </Link>

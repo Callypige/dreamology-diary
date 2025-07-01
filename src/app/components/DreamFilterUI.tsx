@@ -39,7 +39,6 @@ export default function DreamFilterUI() {
               >
                 <option value="">Tous</option>
                 <option value="lucide">Lucide</option>
-                <option value="rêve">Rêve</option>
                 <option value="cauchemar">Cauchemar</option>
                 <option value="autre">Autre</option>
               </select>
