@@ -4,22 +4,35 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// 📝 PUT - Update a specific dream
-export async function PUT(request, { params }) {
-  const session = await getServerSession(authOptions);
+function toDateFromHHMM(hhmm: string | undefined) {
+  if (!hhmm) return undefined;
+  const [h, m] = hhmm.split(":").map(Number);
+  const d = new Date();
+  d.setHours(h, m, 0, 0);
+  return d;
+}
 
+// 📝 PUT - Update a specific dream
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { id } = params;
-  const data = await request.json();
+  const body = await request.json();
 
   await connectMongoDB();
 
+  const updateData = {
+    ...body,
+    sleepTime: toDateFromHHMM(body.sleepTime),
+    wokeUpTime: toDateFromHHMM(body.wokeUpTime),
+  };
+
   const updated = await Dream.findOneAndUpdate(
-    { _id: id, user: session.user.id }, // ensure user owns the dream
-    data,
+    { _id: id, user: session.user.id },
+    updateData,
     { new: true }
   );
 
@@ -31,14 +44,14 @@ export async function PUT(request, { params }) {
 }
 
 // 📥 GET - Retrieve a specific dream
-export async function GET(request, { params }) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
-
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await params
+  const { id } = await params;
+
   await connectMongoDB();
 
   const dream = await Dream.findOne({ _id: id, user: session.user.id });

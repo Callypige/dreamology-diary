@@ -56,7 +56,8 @@ export async function GET(request: { url: string; }) {
   if (tag) filters.tags = { $in: [tag] };
   if (mood) filters.mood = mood;
   if (recurring !== null) filters.recurring = recurring === "true";
-  if (dreamScore !== null) filters.dreamScore = Number(dreamScore);
+  if (dreamScore !== null) filters.dreamScore = { $gte: Number(dreamScore) };
+
 
   const dreams = await Dream.find(filters).sort({ createdAt: -1 });
 
