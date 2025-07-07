@@ -4,16 +4,15 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-function toDateFromHHMM(hhmm: string | undefined) {
-  if (!hhmm) return undefined;
-  const [h, m] = hhmm.split(":").map(Number);
-  const d = new Date();
-  d.setHours(h, m, 0, 0);
-  return d;
+/// Parses a date string in ISO format or other formats supported by the Date constructor.
+function parseDate(value: string): Date | undefined {
+  const date = new Date(value);
+  return isNaN(date.valueOf()) ? undefined : date;
 }
 
 // 📝 PUT - Update a specific dream
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -26,8 +25,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
   const updateData = {
     ...body,
-    sleepTime: toDateFromHHMM(body.sleepTime),
-    wokeUpTime: toDateFromHHMM(body.wokeUpTime),
+    sleepTime: parseDate(body.sleepTime),
+    wokeUpTime: parseDate(body.wokeUpTime),
   };
 
   const updated = await Dream.findOneAndUpdate(

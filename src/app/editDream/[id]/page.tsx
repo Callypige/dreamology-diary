@@ -27,8 +27,8 @@ interface Dream {
   private?: boolean;
 }
 
-export default function EditDream({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function EditDream({ params }) {
+  const { id } = React.use(params)
   const [dream, setDream] = useState<Dream | null>(null);
   const [loading, setLoading] = useState(true);
 
