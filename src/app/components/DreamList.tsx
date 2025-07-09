@@ -12,7 +12,7 @@ interface DreamListProps {
   recurring?: boolean;
   dreamScore?: number;
   mood?: string;
-  tags?: string[]; // Changé de 'tag' à 'tags' pour correspondre à DreamFilterUI
+  tags?: string[]; 
 }
 
 export default function DreamList({ type, recurring, dreamScore, mood, tags }: DreamListProps) {
@@ -31,8 +31,8 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags }: D
           params.append("dreamScore", String(dreamScore));
         }
         if (mood) params.append("mood", mood);
-        if (tags && tags.length > 0 && tags[0]) { // Changé de 'tag' à 'tags' et ajouté vérification que tags[0] n'est pas vide
-          params.append("tag", tags[0]); // un seul tag, comme ton API l'attend
+        if (tags && tags.length > 0 && tags[0]) { 
+          params.append("tag", tags[0]); 
         }
 
         const res = await fetch(`${baseUrl}/api/dreams?${params.toString()}`, {
@@ -50,7 +50,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags }: D
       }
     };
     fetchDreams();
-  }, [type, recurring, dreamScore, mood, tags]); // Changé de 'tag' à 'tags'
+  }, [type, recurring, dreamScore, mood, tags]); 
 
   if (loading) {
     return (
