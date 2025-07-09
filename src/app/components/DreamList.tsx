@@ -12,10 +12,10 @@ interface DreamListProps {
   recurring?: boolean;
   dreamScore?: number;
   mood?: string;
-  tag?: string[];
+  tags?: string[]; // Changé de 'tag' à 'tags' pour correspondre à DreamFilterUI
 }
 
-export default function DreamList({ type, recurring, dreamScore, mood, tag }: DreamListProps) {
+export default function DreamList({ type, recurring, dreamScore, mood, tags }: DreamListProps) {
   const [dreams, setDreams] = useState<Dream[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,10 +31,9 @@ export default function DreamList({ type, recurring, dreamScore, mood, tag }: Dr
           params.append("dreamScore", String(dreamScore));
         }
         if (mood) params.append("mood", mood);
-        if (tag && tag.length > 0) {
-          params.append("tag", tag[0]); // un seul tag, comme ton API l’attend
+        if (tags && tags.length > 0 && tags[0]) { // Changé de 'tag' à 'tags' et ajouté vérification que tags[0] n'est pas vide
+          params.append("tag", tags[0]); // un seul tag, comme ton API l'attend
         }
-
 
         const res = await fetch(`${baseUrl}/api/dreams?${params.toString()}`, {
           cache: "no-cache",
@@ -51,7 +50,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tag }: Dr
       }
     };
     fetchDreams();
-  }, [type, recurring, dreamScore, mood, tag]);
+  }, [type, recurring, dreamScore, mood, tags]); // Changé de 'tag' à 'tags'
 
   if (loading) {
     return (
@@ -138,7 +137,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tag }: Dr
         </div>
       ) : (
         <p className="text-gray-400 text-center text-2xl font-light mt-12">
-          🛌 Rêve correspondant à la recherche pas trouvé
+          🛌 Rêve correspondant à la recherche non trouvé
         </p>
       )}
     </section>
