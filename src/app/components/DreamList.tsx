@@ -11,9 +11,11 @@ interface DreamListProps {
   type?: string;
   recurring?: boolean;
   dreamScore?: number;
+  mood?: string;
+  tag?: string[];
 }
 
-export default function DreamList({ type, recurring, dreamScore }: DreamListProps) {
+export default function DreamList({ type, recurring, dreamScore, mood, tag }: DreamListProps) {
   const [dreams, setDreams] = useState<Dream[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,12 +25,16 @@ export default function DreamList({ type, recurring, dreamScore }: DreamListProp
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
         const params = new URLSearchParams();
 
-        // Add filters to the request if provided
         if (type) params.append("type", type);
         if (recurring !== undefined) params.append("recurring", String(recurring));
         if (dreamScore !== undefined && dreamScore > 0) {
           params.append("dreamScore", String(dreamScore));
         }
+        if (mood) params.append("mood", mood);
+        if (tag && tag.length > 0) {
+          params.append("tag", tag[0]); // un seul tag, comme ton API l’attend
+        }
+
 
         const res = await fetch(`${baseUrl}/api/dreams?${params.toString()}`, {
           cache: "no-cache",
@@ -45,7 +51,7 @@ export default function DreamList({ type, recurring, dreamScore }: DreamListProp
       }
     };
     fetchDreams();
-  }, [type, recurring, dreamScore]);
+  }, [type, recurring, dreamScore, mood, tag]);
 
   if (loading) {
     return (
@@ -79,7 +85,7 @@ export default function DreamList({ type, recurring, dreamScore }: DreamListProp
               className="bg-slate-800 border border-slate-600 rounded-2xl p-6 shadow-lg
                          hover:shadow-2xl hover:scale-[1.02] hover:ring-1 hover:ring-indigo-500/40
                          transition-all duration-300 flex flex-col
-                         h-60 max-w-3xl w-full overflow-hidden"
+                         h-auto max-w-3xl w-full overflow-hidden"
             >
               <Link href={`/viewDream/${dream._id}`}>
                 <h2 className="text-2xl font-bold text-white mb-2 hover:text-indigo-400 transition cursor-pointer line-clamp-1">
@@ -87,9 +93,29 @@ export default function DreamList({ type, recurring, dreamScore }: DreamListProp
                 </h2>
               </Link>
 
-              <p className="text-gray-300 leading-relaxed text-sm sm:text-base mb-4 flex-1 overflow-hidden">
+              <p className="text-gray-300 leading-relaxed text-sm sm:text-base mb-4 line-clamp-3">
                 {dream.description}
               </p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-gray-400 mb-4">
+                <p><span className="font-semibold">Type :</span> {dream.type || "Normal"}</p>
+                <p><span className="font-semibold">Score :</span> {dream.dreamScore || 0}</p>
+                <p><span className="font-semibold">Récurrent :</span> {dream.recurring ? "Oui" : "Non"}</p>
+                <p><span className="font-semibold">Humeur :</span> {dream.mood || "—"}</p>
+              </div>
+
+              {dream.tags && dream.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {dream.tags.map((tag, i) => (
+                    <span
+                      key={i}
+                      className="bg-indigo-700 text-white text-xs px-3 py-1 rounded-full"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               <div className="flex items-center justify-between mt-auto pt-2">
                 <div className="text-xs text-gray-400 leading-tight">
@@ -112,7 +138,7 @@ export default function DreamList({ type, recurring, dreamScore }: DreamListProp
         </div>
       ) : (
         <p className="text-gray-400 text-center text-2xl font-light mt-12">
-          😴 Aucun rêve enregistré. Rêve encore plus fort !
+          🛌 Rêve correspondant à la recherche pas trouvé
         </p>
       )}
     </section>

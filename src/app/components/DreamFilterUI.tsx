@@ -7,13 +7,13 @@ export default function DreamFilterUI() {
   const [type, setType] = useState("");
   const [recurring, setRecurring] = useState(false);
   const [dreamScore, setDreamScore] = useState(0);
+  const [mood, setMood] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-8 px-4">
-      {/* Filtres (visible sur desktop ou via toggle mobile) */}
       <div className="lg:w-1/4 w-full">
-        {/* Bouton toggle visible uniquement sur mobile */}
         <button
           className="lg:hidden mb-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md"
           onClick={() => setShowFilters((prev) => !prev)}
@@ -73,13 +73,45 @@ export default function DreamFilterUI() {
                 className="w-full accent-indigo-500"
               />
             </div>
+             {/* Mood */}
+            <div className="flex flex-col">
+              <label htmlFor="mood" className="text-white mb-1 font-medium">
+                Humeur pendant le rêve :
+              </label>
+              <input
+                id="mood"
+                value={mood}
+                onChange={(e) => setMood(e.target.value)}
+                placeholder="Ex : heureux, stressé"
+                className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600"
+              />
+            </div>
+            {/* Tags */}
+            <div className="flex flex-col">
+              <label htmlFor="tag" className="text-white mb-1 font-medium">
+                Tag :
+              </label>
+              <input
+                id="tag"
+                value={tags[0] || ""}
+                onChange={(e) => setTags([e.target.value.trim()])}
+                placeholder="Ex : école"
+                className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600"
+            />
+            </div>
           </form>
         </div>
       </div>
 
       {/* Liste des rêves */}
       <div className="lg:w-3/4 w-full">
-        <DreamList type={type} recurring={recurring} dreamScore={dreamScore} />
+        <DreamList
+          type={type}
+          recurring={recurring}
+          dreamScore={dreamScore}
+          mood={mood}
+          tags={tags}
+        />
       </div>
     </div>
   );
