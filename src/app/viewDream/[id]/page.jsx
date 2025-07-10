@@ -99,9 +99,15 @@ export default function DreamDetails() {
           </div>
         </div>
 
-        <div className="mt-8 text-right">
-          <Link href="/" className="inline-flex items-center text-gray-300 hover:text-indigo-400 transition">
-            <TbArrowBackUp size={28} className="mr-2" /> Retour à la liste
+        <div className="mt-8 text-center">
+          <Link href={`/editDream/${dream._id}`} className="inline-flex items-center bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition">
+            Modifier ce rêve
+          </Link>
+        </div>
+        <div className="mt-4 text-center">
+          <Link href="/dreams" className="inline-flex items-center text-indigo-400 hover:text-indigo-300 transition">
+            <TbArrowBackUp className="mr-2" />
+            Retour à la liste des rêves
           </Link>
         </div>
       </div>
