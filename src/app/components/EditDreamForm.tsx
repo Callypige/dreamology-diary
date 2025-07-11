@@ -21,6 +21,7 @@ interface EditDreamFormProps {
   wokeUpTime?: string;
   dreamClarity?: number;
   dreamScore?: number;
+  audioNote?: string;
   private?: boolean;
 }
 
@@ -42,6 +43,7 @@ export default function EditDreamForm({
   wokeUpTime,
   dreamClarity,
   dreamScore,
+  audioNote,
   private: isPrivate,
 }: EditDreamFormProps) {
   const router = useRouter();
@@ -62,7 +64,10 @@ export default function EditDreamForm({
   const [newWokeUpTime, setNewWokeUpTime] = useState(wokeUpTime || "");
   const [newDreamClarity, setNewDreamClarity] = useState(dreamClarity || 5);
   const [newDreamScore, setNewDreamScore] = useState(dreamScore || 5);
+  const [newAudioNote, setNewAudioNote] = useState(audioNote || "");
   const [newPrivate, setNewPrivate] = useState(!!isPrivate);
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -221,6 +226,9 @@ export default function EditDreamForm({
         />
         Rêve privé ?
       </label>
+      <hr className="my-4 border-t border-slate-600" />
+
+      {/* Submit button */}
       <button
         type="submit"
         className="mt-4 bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-lg font-semibold transition"
