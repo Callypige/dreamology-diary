@@ -29,6 +29,8 @@ export default function AddDream() {
     private: false,
   });
 
+  // Loading state for better UX
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -41,6 +43,8 @@ export default function AddDream() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3007";
       const res = await fetch(`${baseUrl}/api/dreams`, {
@@ -49,14 +53,19 @@ export default function AddDream() {
         credentials: "include",
         body: JSON.stringify(formData),
       });
+      
       if (res.ok) {
+        // ✅ FIXED: Show success message
+        alert("Rêve créé avec succès ! 🎉");
         router.push("/");
       } else {
         throw new Error("Erreur lors de la création du rêve");
       }
     } catch (error) {
-      console.error(error);
-      alert("Une erreur est survenue.");
+      console.error("Error creating dream:", error);
+      alert("Une erreur est survenue lors de la création du rêve.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -72,7 +81,7 @@ export default function AddDream() {
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-8 p-8 rounded-2xl shadow-lg border border-slate-700">
-        {/* 1. Informations principales */}
+        {/* 1. Main Information */}
         <div>
           <label className={labelClass}>Titre du rêve *</label>
           <input
@@ -116,7 +125,7 @@ export default function AddDream() {
           </div>
         </div>
 
-        {/* 2. Détails */}
+        {/* 2. Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={labelClass}>Intensité du rêve (1–10)</label>
@@ -152,7 +161,7 @@ export default function AddDream() {
           </div>
         </div>
 
-        {/* 3. Sommeil */}
+        {/* 3. Sleep Information */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className={labelClass}>Humeur avant le coucher</label>
@@ -168,21 +177,49 @@ export default function AddDream() {
           </div>
         </div>
 
-        {/* Need separate section for audio notes */}
+        {/* Separator */}
         <hr className="my-6 border-gray-600" />
 
-        {/* 4. Notes & médias */}
+        {/* 4. Audio Note */}
+        <div className="mb-6">
+          <label className={labelClass}>Note vocale (optionnel)</label>       
+          <div>
+              <VoiceRecorder
+                existingAudioUrl={formData.audioNote}
+                onAudioChange={(url) => setFormData({ ...formData, audioNote: url })}
+              />
+          </div>
+        </div>
+
+        {/* 4. Notes & Media */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className={labelClass}>Note vocale</label>
-            <VoiceRecorder
-              existingAudioUrl={formData.audioNote}
-              onAudioChange={(url) => setFormData({ ...formData, audioNote: url })}
+            <label className={labelClass}>Note personnelle (1–10)</label>
+            <input 
+              type="number" 
+              name="dreamScore" 
+              value={formData.dreamScore} 
+              onChange={handleChange} 
+              className={inputClass} 
+              min={1} 
+              max={10} 
+            />
+            <p className="text-sm text-gray-400">Note subjective sur la beauté/intérêt du rêve</p>
+          </div>
+          <div className="col-span-full">
+            <label className={labelClass}>Images / illustrations</label>
+            <input 
+              type="url" 
+              name="images" 
+              value={formData.images} 
+              onChange={handleChange} 
+              className={inputClass} 
+              placeholder="Lien vers des images (séparées par des virgules)" 
             />
           </div>
         </div>
 
-        {/* 5. Confidentialité */}
+        {/* 5. Privacy Settings */}
         <div className="mt-4 border-t pt-4">
           <h3 className="text-lg font-bold text-white mb-2">🔒 Confidentialité</h3>
           <div className="flex items-center gap-3">
@@ -193,9 +230,10 @@ export default function AddDream() {
 
         <button
           type="submit"
-          className="w-full mt-6 p-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all duration-200"
+          disabled={isSubmitting}
+          className="w-full mt-6 p-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all duration-200 disabled:opacity-50"
         >
-          Ajouter le rêve ✨
+          {isSubmitting ? "Création en cours..." : "Ajouter le rêve ✨"}
         </button>
       </form>
 
