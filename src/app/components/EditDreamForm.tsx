@@ -68,44 +68,56 @@ export default function EditDreamForm({
   const [newAudioNote, setNewAudioNote] = useState(audioNote || "");
   const [newPrivate, setNewPrivate] = useState(!!isPrivate);
 
-
+  // Loading state for better UX
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-    const response = await fetch(`${baseUrl}/api/dreams/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        title: newTitle,
-        description: newDescription,
-        mood: newMood,
-        lucidity: newLucidity,
-        tags: newTags.split(",").map((t) => t.trim()),
-        location: newLocation,
-        intensity: newIntensity,
-        recurring: newRecurring,
-        characters: newCharacters.split(",").map((c) => c.trim()),
-        interpretation: newInterpretation,
-        type: newType,
-        beforeSleepMood: newBeforeSleepMood,
-        ...(newSleepTime && { sleepTime: newSleepTime }),
-        ...(newWokeUpTime && { wokeUpTime: newWokeUpTime }),
-        dreamClarity: newDreamClarity,
-        dreamScore: newDreamScore,
-        private: newPrivate,
-      }),
-    });
+      const response = await fetch(`${baseUrl}/api/dreams/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          title: newTitle,
+          description: newDescription,
+          mood: newMood,
+          lucidity: newLucidity,
+          tags: newTags.split(",").map((t) => t.trim()),
+          location: newLocation,
+          intensity: newIntensity,
+          recurring: newRecurring,
+          characters: newCharacters.split(",").map((c) => c.trim()),
+          interpretation: newInterpretation,
+          type: newType,
+          beforeSleepMood: newBeforeSleepMood,
+          ...(newSleepTime && { sleepTime: newSleepTime }),
+          ...(newWokeUpTime && { wokeUpTime: newWokeUpTime }),
+          dreamClarity: newDreamClarity,
+          dreamScore: newDreamScore,
+          audioNote: newAudioNote, // ✅ FIXED: Added missing audioNote
+          private: newPrivate,
+        }),
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // ✅ FIXED: Show success message
+      alert("Rêve mis à jour avec succès ! 🎉");
+      router.push("/");
+
+    } catch (error) {
+      console.error("Error updating dream:", error);
       alert("Une erreur est survenue lors de la mise à jour.");
-      return;
+    } finally {
+      setIsSubmitting(false);
     }
-
-    router.push("/");
   };
 
   return (
@@ -225,6 +237,7 @@ export default function EditDreamForm({
       <VoiceRecorder
         existingAudioUrl={newAudioNote}
         onAudioChange={(url) => setNewAudioNote(url)}
+        dreamId={id} // ✅ FIXED: Added missing dreamId prop
       />
       <hr className="my-4 border-t border-slate-600" />
 
@@ -237,14 +250,14 @@ export default function EditDreamForm({
         />
         Rêve privé ?
       </label>
-      <hr className="my-4 border-t border-slate-600" />
 
       {/* Submit button */}
       <button
         type="submit"
-        className="mt-4 bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-lg font-semibold transition"
+        disabled={isSubmitting}
+        className="mt-4 bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50"
       >
-        Mettre à jour ✨
+        {isSubmitting ? "Mise à jour en cours..." : "Mettre à jour ✨"}
       </button>
     </form>
   );

@@ -90,6 +90,33 @@ export default function DreamDetails() {
           </div>
         </div>
 
+        {/* Audio */}
+        <div className="mb-6">
+          <h2 className="text-xl text-indigo-400 font-semibold border-b border-indigo-500 mb-3">🎤 Note vocale</h2>
+          {dream.audioNote ? (
+            <div className="bg-slate-700 rounded-lg p-4 border border-slate-600">
+              <p className="text-gray-300 mb-3 text-sm">
+                Écoutez la note vocale enregistrée pour ce rêve :
+              </p>
+              <audio controls className="w-full mb-2">
+                <source src={dream.audioNote} type="audio/webm" />
+                <source src={dream.audioNote} type="audio/mp4" />
+                <source src={dream.audioNote} type="audio/mpeg" />
+                Votre navigateur ne supporte pas la lecture audio.
+              </audio>
+              <p className="text-xs text-gray-400">
+                💡 Si l'audio ne se charge pas, vérifiez que le fichier existe encore sur le serveur.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-slate-700 rounded-lg p-4 border border-slate-600">
+              <p className="text-gray-400">Aucune note vocale disponible pour ce rêve.</p>
+            </div>
+          )}
+        </div>
+
+        <hr className="my-6 border-t border-slate-600" />
+
         {/* Extras */}
         <div className="mb-6">
           <h2 className="text-xl text-indigo-400 font-semibold border-b border-indigo-500 mb-3">🎙️ Extras</h2>
