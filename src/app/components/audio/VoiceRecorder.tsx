@@ -2,59 +2,107 @@
 import React, { useState, useRef } from "react";
 
 interface VoiceRecorderProps {
-  onAudioChange: (audio: Blob) => void;
+  onAudioChange: (audioUrl: string) => void; 
   existingAudioUrl?: string;
+  dreamId?: string; // 
 }
 
-export default function VoiceRecorder({ onAudioChange, existingAudioUrl }: VoiceRecorderProps) {
+export default function VoiceRecorder({ 
+  onAudioChange, 
+  existingAudioUrl, 
+  dreamId // 
+}: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(existingAudioUrl || null);
+  const [isUploading, setIsUploading] = useState(false); // 
 
-  // Refs to hold media recorder and audio chunks
-  // Using useRef to avoid re-creating these on every render
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  const startRecording = async () => {
-    setIsRecording(true);
-    audioChunksRef.current = [];
+  const uploadAudio = async (audioBlob: Blob) => {
+    setIsUploading(true);
+    const formData = new FormData();
+    const fileName = `dream_audio_${dreamId || Date.now()}.webm`;
+    formData.append('audio', audioBlob, fileName);
     
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    streamRef.current = stream; // Store the stream to stop it later
-
-    // If there's an existing recording, stop it
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+    if (dreamId) {
+      formData.append('dreamId', dreamId);
     }
     
-    const mediaRecorder = new MediaRecorder(stream);
-    mediaRecorderRef.current = mediaRecorder;
-
-    mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        audioChunksRef.current.push(event.data);
+    try {
+      const response = await fetch('/api/upload/audio', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
+      
+      const data = await response.json();
+      return data.audioUrl;
+    } catch (error) {
+      console.error('Erreur upload audio:', error);
+      throw error;
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
-    mediaRecorder.onstop = () => {
-      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-      setAudioBlob(audioBlob);
-      const url = URL.createObjectURL(audioBlob);
-      setAudioUrl(url);
-      onAudioChange(audioBlob);
-      // Clean up the stream
-      streamRef.current?.getTracks().forEach(track => track.stop());
-    };
+  const startRecording = async () => {
+    try {
+      setIsRecording(true);
+      audioChunksRef.current = [];
+      
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
 
-    mediaRecorder.start();
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        setAudioBlob(audioBlob);
+        
+        const tempUrl = URL.createObjectURL(audioBlob);
+        setAudioUrl(tempUrl);
+        
+        try {
+          const serverAudioUrl = await uploadAudio(audioBlob);
+          setAudioUrl(serverAudioUrl); 
+          onAudioChange(serverAudioUrl);
+        } catch (error) {
+          alert('Erreur lors de la sauvegarde audio');
+          console.error(error);
+        }
+        
+        streamRef.current?.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+    } catch (error) {
+      console.error('Erreur microphone:', error);
+      alert('Impossible d\'accéder au microphone');
+      setIsRecording(false);
+    }
   };
 
   const stopRecording = () => {
     setIsRecording(false);
     mediaRecorderRef.current?.stop();
-    streamRef.current?.getTracks().forEach(track => track.stop());
   };
 
   const playRecording = () => {
@@ -65,22 +113,43 @@ export default function VoiceRecorder({ onAudioChange, existingAudioUrl }: Voice
   };
 
   const deleteRecording = () => {
+    if (audioUrl && audioUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(audioUrl);
+    }
     setAudioBlob(null);
     setAudioUrl(null);
+    onAudioChange("");
   };
 
   return (
     <section className="my-4">
       <h2 className="text-xl font-semibold mb-4 text-white">🎙️ Voice Recorder</h2>
+      <p className="text-gray-300 mb-2">
+        Enregistrez une note vocale pour votre rêve. 
+        {existingAudioUrl ? " Vous pouvez remplacer l'enregistrement existant." : ""}
+      </p>
+      <p className="text-gray-400 mb-4">
+        Cliquez sur "Start Recording" pour commencer, puis "Stop Recording" pour terminer. 
+        Vous pouvez écouter et supprimer l'enregistrement si nécessaire.
+      </p>
+      {/* Uploading status */}
+      {isUploading && (
+        <div className="mb-4 p-2 bg-blue-600 text-white rounded">
+          📤 Upload en cours...
+        </div>
+      )}
+      
       <div className="flex items-center space-x-4 flex-wrap gap-2">
         <button
+          type="button"
           onClick={startRecording}
-          disabled={isRecording}
+          disabled={isRecording || isUploading}
           className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
         >
           {isRecording ? "🔴 Recording..." : "🎤 Start Recording"}
         </button>
         <button
+          type="button"
           onClick={stopRecording}
           className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded"
           disabled={!isRecording}
@@ -88,16 +157,18 @@ export default function VoiceRecorder({ onAudioChange, existingAudioUrl }: Voice
           ⏹️ Stop Recording
         </button>
         <button
+          type="button"
           onClick={playRecording}
           className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded"
-          disabled={!audioUrl}
+          disabled={!audioUrl || isUploading}
         >
           ▶️ Play Recording 
         </button>
         <button
+          type="button"
           onClick={deleteRecording}
           className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded"
-          disabled={!audioUrl}
+          disabled={!audioUrl || isUploading}
         >
           🗑️ Delete Recording
         </button>
@@ -111,7 +182,7 @@ export default function VoiceRecorder({ onAudioChange, existingAudioUrl }: Voice
             Your browser does not support the audio element.
           </audio>
           <p className="text-sm text-gray-400 mt-2">
-            Audio enregistré et prêt à être sauvegardé.
+            {isUploading ? "Upload en cours..." : "Audio enregistré et sauvegardé."}
           </p>
         </div>
       )}

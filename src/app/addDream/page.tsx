@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TbArrowBackUp } from "react-icons/tb";
+import VoiceRecorder from "../components/audio/VoiceRecorder";
 
 export default function AddDream() {
   const [formData, setFormData] = useState({
@@ -167,21 +168,17 @@ export default function AddDream() {
           </div>
         </div>
 
+        {/* Need separate section for audio notes */}
+        <hr className="my-6 border-gray-600" />
+
         {/* 4. Notes & médias */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className={labelClass}>Note personnelle (1–10)</label>
-            <input type="number" name="dreamScore" value={formData.dreamScore} onChange={handleChange} className={inputClass} min={1} max={10} />
-            <p className="text-sm text-gray-400">Note subjective sur la beauté/intérêt du rêve</p>
-          </div>
-          <div>
-            <label className={labelClass}>Lien audio (optionnel)</label>
-            <input type="url" name="audioNote" value={formData.audioNote} onChange={handleChange} className={inputClass} />
-            <p className="text-sm text-gray-400">Lien vers une note vocale enregistrée</p>
-          </div>
-          <div className="col-span-full">
-            <label className={labelClass}>Images / illustrations</label>
-            <input type="url" name="images" value={formData.images} onChange={handleChange} className={inputClass} placeholder="Lien vers des images (séparées par des virgules)" />
+            <label className={labelClass}>Note vocale</label>
+            <VoiceRecorder
+              existingAudioUrl={formData.audioNote}
+              onAudioChange={(url) => setFormData({ ...formData, audioNote: url })}
+            />
           </div>
         </div>
 

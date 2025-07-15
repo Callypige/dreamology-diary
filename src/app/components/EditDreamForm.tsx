@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import VoiceRecorder from "./audio/VoiceRecorder";
 
 interface EditDreamFormProps {
   id: string;
@@ -218,6 +219,16 @@ export default function EditDreamForm({
         />
         Rêve récurrent ?
       </label>
+
+      {/* Audio note section */}
+      <hr className="my-4 border-t border-slate-600" />
+      <VoiceRecorder
+        existingAudioUrl={newAudioNote}
+        onAudioChange={(url) => setNewAudioNote(url)}
+      />
+      <hr className="my-4 border-t border-slate-600" />
+
+      {/* Private toggle */}
       <label className="flex items-center gap-2">
         <input
           type="checkbox"
