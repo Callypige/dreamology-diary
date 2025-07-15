@@ -29,7 +29,7 @@ MongoDB with Mongoose
 
 NextAuth.js for authentication
 
-Tailwind CSS (or your preferred UI library)
+Tailwind CSS
 
 HTML5 Audio / Web Audio API
 
@@ -43,7 +43,7 @@ Prerequisites
 
 Node.js ≥ 16
 
-MongoDB (local or Atlas)
+MongoDB (Atlas)
 
 
 Install
