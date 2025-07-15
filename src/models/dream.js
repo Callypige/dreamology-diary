@@ -32,7 +32,7 @@ const dreamSchema = new Schema(
     audioNote: { type: String }, // URL to an audio file
     images: [{ type: String }], // List of image URLs
     dreamScore: { type: Number, min: 1, max: 10 }, // User's personal rating
-    private: { type: Boolean, default: false }, // Visibility toggle
+    private: { type: Boolean, default: true }, // Visibility toggle
   },
   {
     timestamps: true, // Auto-generated createdAt and updatedAt fields

@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import DreamList from "./DreamList";
-import { testMicro } from "./TestMicro";
 
 export default function DreamFilterUI() {
   const [type, setType] = useState("");
@@ -11,30 +10,11 @@ export default function DreamFilterUI() {
   const [mood, setMood] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
-  
-  // Function to test the microphone
-  // This function will be called when the user clicks the "Tester le micro" button
-  const testMicrophone = async () => {
-    try {
-      await testMicro();
-    } catch (error) {
-      console.error("Erreur lors du test du microphone :", error);
-      alert("Erreur lors de l'accès au microphone. Veuillez vérifier les paramètres de votre navigateur.");
-    }
-  }
+  const [hasAudio, setHasAudio] = useState(false);
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-8 px-4">
       <div className="lg:w-1/4 w-full">
-
-        {/* I want to put a button for test microphone */}
-        <button
-          className="mb-4 w-full bg-green-600 text-white py-2 px-4 rounded-md"
-          onClick={testMicrophone}
-        >
-          Tester le micro
-        </button>
-
         <button
           className="lg:hidden mb-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md"
           onClick={() => setShowFilters((prev) => !prev)}
@@ -120,6 +100,19 @@ export default function DreamFilterUI() {
                 className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600"
             />
             </div>
+            {/* hasAudio */}
+            <div className="flex items-center gap-2">
+              <input
+                id="hasAudio"
+                type="checkbox"
+                checked={hasAudio}
+                onChange={(e) => setHasAudio(e.target.checked)}
+                className="accent-indigo-600 w-5 h-5"
+              />
+              <label htmlFor="hasAudio" className="text-white font-medium">
+                Rêves avec audio
+              </label>
+            </div>
           </form>
         </div>
       </div>
@@ -132,6 +125,7 @@ export default function DreamFilterUI() {
           dreamScore={dreamScore}
           mood={mood}
           tags={tags}
+          hasAudio={hasAudio}
         />
       </div>
     </div>

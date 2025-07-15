@@ -13,4 +13,6 @@ export interface Dream {
   mood: string;
   sleepTime: string; // HH:mm format
   wokeUpTime: string; // HH:mm format
+  hasAudio: boolean;
+  audioNote?: string; // URL to audio file
 }
