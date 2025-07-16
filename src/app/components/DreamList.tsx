@@ -5,7 +5,7 @@ import Link from "next/link";
 import { HiPencilAlt } from "react-icons/hi";
 import RemoveBtn from "./RemoveBtn";
 import Image from "next/image";
-import { Dream } from "../../../types/Dream";
+import { Dream } from "../../types/Dream";
 import Pagination from "./pagination/pagination";
 
 interface DreamListProps {

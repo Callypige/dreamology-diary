@@ -1,5 +1,5 @@
 export interface Dream {
-  _id: string;
+  id: string;
   title: string;
   description: string;
   createdAt: string;
@@ -15,4 +15,9 @@ export interface Dream {
   wokeUpTime: string; // HH:mm format
   hasAudio: boolean;
   audioNote?: string; // URL to audio file
+  location: string;
+  characters: string[];
+  beforeSleepMood: string;
+  dreamClarity: number; // 1 to 10 scale
+  private: boolean;
 }

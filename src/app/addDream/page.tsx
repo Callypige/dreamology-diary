@@ -3,15 +3,24 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { TbArrowBackUp } from "react-icons/tb";
+import { TbArrowBackUp, TbChevronDown, TbChevronUp } from "react-icons/tb";
 import VoiceRecorder from "../components/audio/VoiceRecorder";
 
 export default function AddDream() {
+  // Helper function to get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     type: "rêve",
-    date: "",
+    date: getTodayDate(), // ✅ Date d'aujourd'hui par défaut
     intensity: "",
     mood: "",
     lucidity: false,
@@ -29,9 +38,24 @@ export default function AddDream() {
     private: false,
   });
 
-  // Loading state for better UX
+  // Collapsible sections state
+  const [expandedSections, setExpandedSections] = useState({
+    details: false,
+    organization: false,
+    sleep: false,
+    audio: false,
+    other: false
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -55,7 +79,6 @@ export default function AddDream() {
       });
       
       if (res.ok) {
-        // ✅ FIXED: Show success message
         alert("Rêve créé avec succès ! 🎉");
         router.push("/");
       } else {
@@ -69,10 +92,8 @@ export default function AddDream() {
     }
   };
 
-  const inputClass =
-    "w-full p-3 rounded-xl bg-slate-800 text-white placeholder-gray-400 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500";
-
-  const labelClass = "font-semibold text-white";
+  const inputClass = "w-full p-3 rounded-xl bg-slate-800 text-white placeholder-gray-400 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500";
+  const labelClass = "font-semibold text-white mb-2 block";
 
   return (
     <section className="w-full max-w-4xl mx-auto pt-24 px-6 min-h-screen">
@@ -80,160 +101,308 @@ export default function AddDream() {
         🌙 Ajouter un Nouveau Rêve
       </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-8 p-8 rounded-2xl shadow-lg border border-slate-700">
-        {/* 1. Main Information */}
-        <div>
-          <label className={labelClass}>Titre du rêve *</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className={inputClass}
-            placeholder="Titre"
-            required
-          />
-        </div>
-
-        <div>
-          <label className={labelClass}>Description *</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className={`${inputClass} h-32 resize-none`}
-            placeholder="Décris ton rêve en détail..."
-            required
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-6 p-6 md:p-8 rounded-2xl shadow-lg border border-slate-700">
+        
+        {/* Essential Fields - Always Visible */}
+        <div className="space-y-6">
           <div>
-            <label className={labelClass}>Type de rêve</label>
-            <select name="type" value={formData.type} onChange={handleChange} className={inputClass}>
-              <option value="rêve">Rêve</option>
-              <option value="cauchemar">Cauchemar</option>
-              <option value="lucide">Lucide</option>
-              <option value="autre">Autre</option>
-            </select>
-            <p className="text-sm text-gray-400">Choisis le type général du rêve</p>
+            <label className={labelClass}>Titre du rêve *</label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              className={inputClass}
+              placeholder="Donnez un titre à votre rêve..."
+              required
+            />
           </div>
 
           <div>
-            <label className={labelClass}>Date</label>
-            <input type="date" name="date" value={formData.date} onChange={handleChange} className={inputClass} />
+            <label className={labelClass}>Description *</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              className={`${inputClass} h-32 resize-none`}
+              placeholder="Décrivez votre rêve en détail..."
+              required
+            />
           </div>
-        </div>
 
-        {/* 2. Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className={labelClass}>Intensité du rêve (1–10)</label>
-            <input type="number" name="intensity" value={formData.intensity} onChange={handleChange} className={inputClass} min={1} max={10} />
-          </div>
-          <div>
-            <label className={labelClass}>Humeur dans le rêve</label>
-            <input type="text" name="mood" value={formData.mood} onChange={handleChange} className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass}>Clarté du souvenir (1–10)</label>
-            <input type="number" name="dreamClarity" value={formData.dreamClarity} onChange={handleChange} className={inputClass} min={1} max={10} />
-          </div>
-          <div>
-            <label className={labelClass}>Lieu</label>
-            <input type="text" name="location" value={formData.location} onChange={handleChange} className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass}>Personnages</label>
-            <input type="text" name="characters" value={formData.characters} onChange={handleChange} className={inputClass} placeholder="Séparés par des virgules" />
-          </div>
-          <div>
-            <label className={labelClass}>Tags</label>
-            <input type="text" name="tags" value={formData.tags} onChange={handleChange} className={inputClass} placeholder="vol, chute, animal..." />
-          </div>
-          <div className="col-span-full">
-            <label className={labelClass}>Interprétation personnelle</label>
-            <textarea name="interpretation" value={formData.interpretation} onChange={handleChange} className={`${inputClass} h-24 resize-none`} placeholder="Sens ou réflexion sur le rêve" />
-          </div>
-          <div className="flex items-center gap-3">
-            <input type="checkbox" name="lucidity" checked={formData.lucidity} onChange={handleChange} />
-            <label className={labelClass}>C'était un rêve lucide</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className={labelClass}>Type de rêve</label>
+              <select name="type" value={formData.type} onChange={handleChange} className={inputClass}>
+                <option value="rêve">Rêve</option>
+                <option value="cauchemar">Cauchemar</option>
+                <option value="lucide">Lucide</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
+
+            <div>
+              <label className={labelClass}>Date du rêve</label>
+              <input 
+                type="date" 
+                name="date" 
+                value={formData.date} 
+                onChange={handleChange} 
+                className={inputClass} 
+              />
+            </div>
           </div>
         </div>
 
-        {/* 3. Sleep Information */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className={labelClass}>Humeur avant le coucher</label>
-            <input type="text" name="beforeSleepMood" value={formData.beforeSleepMood} onChange={handleChange} className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass}>Heure de coucher</label>
-            <input type="time" name="sleepTime" value={formData.sleepTime} onChange={handleChange} className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass}>Heure de réveil</label>
-            <input type="time" name="wokeUpTime" value={formData.wokeUpTime} onChange={handleChange} className={inputClass} />
-          </div>
+        {/* Collapsible Sections */}
+        
+        {/* Dream Details Section */}
+        <div className="border border-slate-600 rounded-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('details')}
+            className="w-full flex items-center justify-between p-4 bg-slate-700 hover:bg-slate-600 transition-colors"
+          >
+            <h3 className="text-lg text-indigo-400 font-semibold">🌙 Détails du rêve</h3>
+            {expandedSections.details ? <TbChevronUp size={20} /> : <TbChevronDown size={20} />}
+          </button>
+          
+          {expandedSections.details && (
+            <div className="p-4 bg-slate-800 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Humeur dans le rêve</label>
+                  <input 
+                    type="text" 
+                    name="mood" 
+                    value={formData.mood} 
+                    onChange={handleChange} 
+                    className={inputClass}
+                    placeholder="Ex: heureux, anxieux, paisible..."
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Intensité (1-10)</label>
+                  <input 
+                    type="number" 
+                    name="intensity" 
+                    value={formData.intensity} 
+                    onChange={handleChange} 
+                    className={inputClass} 
+                    min={1} 
+                    max={10}
+                    placeholder="1-10"
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Lieu du rêve</label>
+                  <input 
+                    type="text" 
+                    name="location" 
+                    value={formData.location} 
+                    onChange={handleChange} 
+                    className={inputClass}
+                    placeholder="Ex: maison, école, forêt..."
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Clarté du souvenir (1-10)</label>
+                  <input 
+                    type="number" 
+                    name="dreamClarity" 
+                    value={formData.dreamClarity} 
+                    onChange={handleChange} 
+                    className={inputClass} 
+                    min={1} 
+                    max={10}
+                    placeholder="1-10"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className={labelClass}>Personnages présents</label>
+                <input 
+                  type="text" 
+                  name="characters" 
+                  value={formData.characters} 
+                  onChange={handleChange} 
+                  className={inputClass}
+                  placeholder="Séparés par des virgules"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <input 
+                  type="checkbox" 
+                  name="lucidity" 
+                  checked={formData.lucidity} 
+                  onChange={handleChange}
+                  className="w-5 h-5 accent-indigo-500"
+                />
+                <label className="text-white font-medium">C'était un rêve lucide</label>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Separator */}
-        <hr className="my-6 border-gray-600" />
+        {/* Organization Section */}
+        <div className="border border-slate-600 rounded-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('organization')}
+            className="w-full flex items-center justify-between p-4 bg-slate-700 hover:bg-slate-600 transition-colors"
+          >
+            <h3 className="text-lg text-indigo-400 font-semibold">🏷️ Organisation</h3>
+            {expandedSections.organization ? <TbChevronUp size={20} /> : <TbChevronDown size={20} />}
+          </button>
+          
+          {expandedSections.organization && (
+            <div className="p-4 bg-slate-800 space-y-4">
+              <div>
+                <label className={labelClass}>Tags</label>
+                <input 
+                  type="text" 
+                  name="tags" 
+                  value={formData.tags} 
+                  onChange={handleChange} 
+                  className={inputClass}
+                  placeholder="vol, chute, animal, famille..."
+                />
+                <p className="text-xs text-gray-400 mt-1">Séparés par des virgules</p>
+              </div>
+              <div>
+                <label className={labelClass}>Interprétation personnelle</label>
+                <textarea 
+                  name="interpretation" 
+                  value={formData.interpretation} 
+                  onChange={handleChange} 
+                  className={`${inputClass} h-24 resize-none`}
+                  placeholder="Que pensez-vous que ce rêve signifie ?"
+                />
+              </div>
+            </div>
+          )}
+        </div>
 
-        {/* 4. Audio Note */}
-        <div className="mb-6">
-          <label className={labelClass}>Note vocale (optionnel)</label>       
-          <div>
+        {/* Sleep Section */}
+        <div className="border border-slate-600 rounded-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('sleep')}
+            className="w-full flex items-center justify-between p-4 bg-slate-700 hover:bg-slate-600 transition-colors"
+          >
+            <h3 className="text-lg text-indigo-400 font-semibold">🧘 Informations sur le sommeil</h3>
+            {expandedSections.sleep ? <TbChevronUp size={20} /> : <TbChevronDown size={20} />}
+          </button>
+          
+          {expandedSections.sleep && (
+            <div className="p-4 bg-slate-800 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className={labelClass}>Humeur avant le coucher</label>
+                  <input 
+                    type="text" 
+                    name="beforeSleepMood" 
+                    value={formData.beforeSleepMood} 
+                    onChange={handleChange} 
+                    className={inputClass}
+                    placeholder="Ex: détendu, stressé..."
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Heure de coucher</label>
+                  <input 
+                    type="time" 
+                    name="sleepTime" 
+                    value={formData.sleepTime} 
+                    onChange={handleChange} 
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Heure de réveil</label>
+                  <input 
+                    type="time" 
+                    name="wokeUpTime" 
+                    value={formData.wokeUpTime} 
+                    onChange={handleChange} 
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Audio Section */}
+        <div className="border border-slate-600 rounded-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('audio')}
+            className="w-full flex items-center justify-between p-4 bg-slate-700 hover:bg-slate-600 transition-colors"
+          >
+            <h3 className="text-lg text-indigo-400 font-semibold">🎤 Note vocale</h3>
+            {expandedSections.audio ? <TbChevronUp size={20} /> : <TbChevronDown size={20} />}
+          </button>
+          
+          {expandedSections.audio && (
+            <div className="p-4 bg-slate-800">
               <VoiceRecorder
                 existingAudioUrl={formData.audioNote}
                 onAudioChange={(url) => setFormData({ ...formData, audioNote: url })}
+                dreamId={undefined}
               />
-          </div>
+            </div>
+          )}
         </div>
 
-        {/* 4. Notes & Media */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className={labelClass}>Note personnelle (1–10)</label>
-            <input 
-              type="number" 
-              name="dreamScore" 
-              value={formData.dreamScore} 
-              onChange={handleChange} 
-              className={inputClass} 
-              min={1} 
-              max={10} 
-            />
-            <p className="text-sm text-gray-400">Note subjective sur la beauté/intérêt du rêve</p>
-          </div>
-          <div className="col-span-full">
-            <label className={labelClass}>Images / illustrations</label>
-            <input 
-              type="url" 
-              name="images" 
-              value={formData.images} 
-              onChange={handleChange} 
-              className={inputClass} 
-              placeholder="Lien vers des images (séparées par des virgules)" 
-            />
-          </div>
+        {/* Other Settings Section */}
+        <div className="border border-slate-600 rounded-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => toggleSection('other')}
+            className="w-full flex items-center justify-between p-4 bg-slate-700 hover:bg-slate-600 transition-colors"
+          >
+            <h3 className="text-lg text-indigo-400 font-semibold">⚙️ Autres paramètres</h3>
+            {expandedSections.other ? <TbChevronUp size={20} /> : <TbChevronDown size={20} />}
+          </button>
+          
+          {expandedSections.other && (
+            <div className="p-4 bg-slate-800 space-y-4">
+              <div>
+                <label className={labelClass}>Note personnelle (1-10)</label>
+                <input 
+                  type="number" 
+                  name="dreamScore" 
+                  value={formData.dreamScore} 
+                  onChange={handleChange} 
+                  className={inputClass} 
+                  min={1} 
+                  max={10}
+                  placeholder="1-10"
+                />
+                <p className="text-xs text-gray-400 mt-1">Votre appréciation personnelle du rêve</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <input 
+                  type="checkbox" 
+                  name="private" 
+                  checked={formData.private} 
+                  onChange={handleChange}
+                  className="w-5 h-5 accent-indigo-500"
+                />
+                <label className="text-white font-medium">Rêve privé (non visible publiquement)</label>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* 5. Privacy Settings */}
-        <div className="mt-4 border-t pt-4">
-          <h3 className="text-lg font-bold text-white mb-2">🔒 Confidentialité</h3>
-          <div className="flex items-center gap-3">
-            <input type="checkbox" name="private" checked={formData.private} onChange={handleChange} />
-            <label className={labelClass}>Rêve privé (non visible publiquement)</label>
-          </div>
-        </div>
-
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full mt-6 p-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all duration-200 disabled:opacity-50"
+          className="w-full mt-8 p-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all duration-200 disabled:opacity-50"
         >
-          {isSubmitting ? "Création en cours..." : "Ajouter le rêve ✨"}
+          {isSubmitting ? "Création en cours..." : "Créer le rêve ✨"}
         </button>
       </form>
 
