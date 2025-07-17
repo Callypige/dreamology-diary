@@ -20,4 +20,7 @@ export interface Dream {
   beforeSleepMood: string;
   dreamClarity: number; // 1 to 10 scale
   private: boolean;
+  date: string; // ISO date string
+  interpretation?: string; // optional interpretation of the dream
+  [key: string]: any;
 }

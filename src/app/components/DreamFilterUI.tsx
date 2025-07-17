@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import DreamList from "./DreamList";
+import Calendar from "./calendar/Calendar";
 
 export default function DreamFilterUI() {
   const [type, setType] = useState("");
@@ -11,23 +12,38 @@ export default function DreamFilterUI() {
   const [tags, setTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [hasAudio, setHasAudio] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-8 px-4">
       <div className="lg:w-1/4 w-full">
+
         <button
-          className="lg:hidden mb-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md"
+          className="mb-4 w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md transition-colors"
+          onClick={() => setShowCalendar((prev) => !prev)}
+        >
+          {showCalendar ? "Masquer le calendrier" : "Afficher le calendrier"}
+        </button>
+
+        <div className={`transition-all duration-300 overflow-hidden ${
+          showCalendar ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+        }`}>
+          <Calendar />
+        </div>
+        
+        <button
+          className="lg:hidden mb-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md transition-colors"
           onClick={() => setShowFilters((prev) => !prev)}
         >
           {showFilters ? "Masquer les filtres" : "Afficher les filtres"}
         </button>
 
-        {/* Formulaire de filtres */}
-        <div className={`lg:block ${showFilters ? "block" : "hidden"}`}>
+        <div className={`lg:block transition-all duration-300 overflow-hidden ${
+          showFilters ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0 lg:max-h-none lg:opacity-100"
+        }`}>
           <form className="bg-slate-800 rounded-xl p-6 shadow-md border border-slate-700 space-y-6">
             <h2 className="text-2xl text-white font-semibold">Filtres</h2>
-
-            {/* Type de rêve */}
+          
             <div className="flex flex-col">
               <label htmlFor="type" className="text-white mb-1 font-medium">
                 Type de rêve :
@@ -36,7 +52,7 @@ export default function DreamFilterUI() {
                 id="type"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="bg-slate-700 text-white rounded px-3 py-2 focus:outline-none border border-slate-600"
+                className="bg-slate-700 text-white rounded px-3 py-2 focus:outline-none border border-slate-600 focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">Tous</option>
                 <option value="lucide">Lucide</option>
@@ -74,7 +90,8 @@ export default function DreamFilterUI() {
                 className="w-full accent-indigo-500"
               />
             </div>
-             {/* Mood */}
+
+            {/* Mood */}
             <div className="flex flex-col">
               <label htmlFor="mood" className="text-white mb-1 font-medium">
                 Humeur pendant le rêve :
@@ -84,9 +101,10 @@ export default function DreamFilterUI() {
                 value={mood}
                 onChange={(e) => setMood(e.target.value)}
                 placeholder="Ex : heureux, stressé"
-                className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600"
+                className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600 focus:ring-2 focus:ring-indigo-500"
               />
             </div>
+
             {/* Tags */}
             <div className="flex flex-col">
               <label htmlFor="tag" className="text-white mb-1 font-medium">
@@ -97,9 +115,10 @@ export default function DreamFilterUI() {
                 value={tags[0] || ""}
                 onChange={(e) => setTags([e.target.value.trim()])}
                 placeholder="Ex : école"
-                className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600"
-            />
+                className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600 focus:ring-2 focus:ring-indigo-500"
+              />
             </div>
+
             {/* hasAudio */}
             <div className="flex items-center gap-2">
               <input
@@ -110,7 +129,7 @@ export default function DreamFilterUI() {
                 className="accent-indigo-600 w-5 h-5"
               />
               <label htmlFor="hasAudio" className="text-white font-medium">
-                Rêves avec audio
+                Rêves avec audio uniquement
               </label>
             </div>
           </form>

@@ -149,6 +149,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
                            transition-all duration-300 flex flex-col
                            h-auto max-w-3xl w-full overflow-hidden"
               >
+                <h4>Rêve du {new Date(dream.createdAt).toLocaleDateString("fr-FR")}</h4>
                 <Link href={`/viewDream/${dream._id}`}>
                   <h2 className="text-2xl font-bold text-white mb-2 hover:text-indigo-400 transition cursor-pointer line-clamp-1">
                     {dream.title}
