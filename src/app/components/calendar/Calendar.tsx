@@ -1,23 +1,30 @@
 "use client";
 
+import { Dream } from "@/types/Dream";
 import { useState, useEffect } from "react";
 
-export default function Calendar() {
+export default function Calendar({ onDateSelected }: { 
+  onDateSelected?: (date: Date, dreams: Dream[]) => void 
+}) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [dreams, setDreams] = useState([]);
+  const [dreams, setDreams] = useState<Dream[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false); // Nouvel état pour les transitions
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Noms des mois en français
   const monthNames = [
     'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
     'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
   ];
 
-  // Noms des jours en français (version courte pour mobile)
-  const dayNames = ['D', 'L', 'M', 'M', 'J', 'V', 'S']; // Plus court pour mobile
+  const dayNames = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
 
-  // Récupérer les rêves du mois actuel
+  // Click handler for day selection
+  const handleDayClick = (selectedDate: Date) => {
+  if (onDateSelected) {
+    onDateSelected(selectedDate, []); 
+    }
+  }
+
   useEffect(() => {
     fetchDreams();
   }, [currentDate]);
@@ -52,46 +59,45 @@ export default function Calendar() {
     }
   };
 
-  // Générer les jours du calendrier (version stable)
-  const generateCalendarDays = () => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const startDate = new Date(firstDay);
-    
-    // Commencer au dimanche de la semaine
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
-    
-    const days = [];
-    const currentDay = new Date(startDate);
-    
-    // Toujours générer exactement 42 jours (6 semaines) pour éviter les sauts de layout
-    for (let i = 0; i < 42; i++) {
-      const dateString = currentDay.toISOString().split('T')[0];
-      const dayDreams = dreams.filter(dream => {
-        const dreamDate = new Date(dream.createdAt).toISOString().split('T')[0];
-        return dreamDate === dateString;
-      });
+    const generateCalendarDays = () => {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      
+      const firstDay = new Date(year, month, 1);
+      const startDate = new Date(firstDay);
+      startDate.setDate(startDate.getDate() - firstDay.getDay());
+      
+      const days = [];
+      const currentDay = new Date(startDate);
+      
+      for (let i = 0; i < 42; i++) {
+        // VERSION CORRIGÉE - éviter les fuseaux horaires
+        const year = currentDay.getFullYear();
+        const month = (currentDay.getMonth() + 1).toString().padStart(2, '0');
+        const day = currentDay.getDate().toString().padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`; // "2025-07-10"
+        
+        const dayDreams = dreams.filter(dream => {
+          const dreamDateString = dream.date.split('T')[0]; // "2025-07-10"
+          return dreamDateString === dateString;
+        });
 
-      days.push({
-        date: new Date(currentDay),
-        dayNumber: currentDay.getDate(),
-        isCurrentMonth: currentDay.getMonth() === month,
-        dreams: dayDreams,
-        dateString: dateString
-      });
+        days.push({
+          date: new Date(currentDay),
+          dayNumber: currentDay.getDate(),
+          isCurrentMonth: currentDay.getMonth() === currentDate.getMonth(),
+          dreams: dayDreams,
+          dateString: dateString
+        });
 
-      currentDay.setDate(currentDay.getDate() + 1);
-    }
+        currentDay.setDate(currentDay.getDate() + 1);
+      }
 
-    return days;
-  };
+      return days;
+    };
 
   const calendarDays = generateCalendarDays();
 
-  // Navigation avec transition smooth
   const goToPreviousMonth = () => {
     setIsTransitioning(true);
     setTimeout(() => {
@@ -116,17 +122,16 @@ export default function Calendar() {
     }, 150);
   };
 
-  // Vérifier si c'est aujourd'hui
-  const isToday = (date) => {
+
+  const isToday = (date: Date) : boolean => {
     const today = new Date();
     return date.toDateString() === today.toDateString();
   };
 
   return (
-    <div className="w-full mb-6 overflow-hidden"> {/* Ajout overflow-hidden */}
+    <div className="w-full mb-6 overflow-hidden"> 
       <div className="bg-slate-800 rounded-xl p-2 md:p-4 border border-slate-700">
         
-        {/* En-tête du calendrier - Optimisé mobile avec overflow fixé */}
         <div className="flex items-center justify-between mb-3 min-h-[40px]">
           <h2 className="text-sm md:text-xl font-bold text-white truncate flex-1 mr-2">
             {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
@@ -157,17 +162,14 @@ export default function Calendar() {
           </div>
         </div>
 
-        {/* Loading avec hauteur fixe pour éviter les sauts */}
         {loading && (
           <div className="h-64 flex items-center justify-center">
             <div className="text-gray-400 text-sm">Chargement...</div>
           </div>
         )}
 
-        {/* Calendrier avec hauteur fixe */}
         {!loading && (
           <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}>
-            {/* Jours de la semaine - Plus compact sur mobile */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {dayNames.map((day, index) => (
                 <div key={index} className="p-1 md:p-2 text-center text-xs md:text-sm font-medium text-gray-400">
@@ -176,26 +178,32 @@ export default function Calendar() {
               ))}
             </div>
 
-            {/* Grille des jours - Hauteur fixe avec overflow fixé */}
             <div className="grid grid-cols-7 gap-0.5 md:gap-1 min-h-[180px] md:min-h-[280px]">
               {calendarDays.map((day, index) => (
-                <div
-                  key={`${day.dateString}-${index}`}
-                  className={`
-                    relative p-0.5 md:p-2 min-h-[24px] md:min-h-[40px] border border-slate-600 rounded-sm md:rounded-md text-center overflow-hidden
-                    ${day.isCurrentMonth ? 'bg-slate-700' : 'bg-slate-800 opacity-50'}
-                    ${isToday(day.date) ? 'border-indigo-400 bg-indigo-900/20' : ''}
-                    transition-colors duration-200
-                  `}
+               <div
+                key={`${day.dateString}-${index}`}
+                className={`
+                  relative p-0.5 md:p-2 min-h-[24px] md:min-h-[40px] border border-slate-600 rounded-sm md:rounded-md text-center overflow-hidden
+                  cursor-pointer select-none touch-manipulation
+                  ${day.isCurrentMonth ? 'bg-slate-700 hover:bg-slate-600 active:bg-slate-500' : 'bg-slate-800 opacity-50 hover:opacity-75'}
+                  ${isToday(day.date) ? 'border-indigo-400 bg-indigo-900/20' : ''}
+                  transition-all duration-200 hover:shadow-md
+                `}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('🖱️ onClick déclenché pour le jour:', day.dayNumber);
+                  handleDayClick(day.date);
+                }}
+                onMouseEnter={() => console.log('🐭 Hover sur le jour:', day.dayNumber)}
                 >
-                  {/* Numéro du jour */}
+
                   <div className={`text-[10px] md:text-sm font-medium leading-tight ${
-                    day.isCurrentMonth ? 'text-white' : 'text-gray-500'
-                  }`}>
-                    {day.dayNumber}
+                      day.isCurrentMonth ? 'text-white' : 'text-gray-500'
+                    }`}>
+                      {day.dayNumber}
                   </div>
 
-                  {/* Indicateurs de rêves - Ultra compacts sur mobile */}
                   {day.dreams.length > 0 && (
                     <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center">
                       <div className="flex items-center gap-0.5">
@@ -205,7 +213,7 @@ export default function Calendar() {
                             className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full ${
                               dream.type === 'lucide' ? 'bg-yellow-400' :
                               dream.type === 'cauchemar' ? 'bg-red-500' :
-                              'bg-blue-400'
+                              dream.type === 'autre' ? 'bg-blue-400' : 'bg-zinc-500'
                             }`}
                           />
                         ))}
@@ -218,10 +226,8 @@ export default function Calendar() {
                       </div>
                     </div>
                   )}
-
-                  {/* Indicateur aujourd'hui */}
                   {isToday(day.date) && (
-                    <div className="absolute top-0 right-0 w-1 h-1 md:w-2 md:h-2 bg-indigo-400 rounded-full"></div>
+                    <div className="absolute top-0 right-0 w-1 h-1 md:w-2 md:h-2 bg-slate-100 rounded-full"></div>
                   )}
                 </div>
               ))}
@@ -229,7 +235,6 @@ export default function Calendar() {
           </div>
         )}
 
-        {/* Légende - Plus compacte sur mobile */}
         <div className="flex items-center gap-2 md:gap-4 mt-3 text-xs md:text-sm text-gray-300 overflow-x-auto">
           <div className="flex items-center gap-1 flex-shrink-0">
             <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-yellow-400 rounded-full"></div>

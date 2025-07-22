@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 function toDateFromHHMM(hhmm: string | undefined) {
-  if (!hhmm) return undefined;             
+  if (!hhmm) return undefined;
   const [h, m] = hhmm.split(":").map(Number);
   const d = new Date();                     
   d.setHours(h, m, 0, 0);
@@ -51,6 +51,9 @@ export async function GET(request: { url: string; }) {
   const recurring = searchParams.get("recurring"); // string: "true"/"false"
   const dreamScore = searchParams.get("dreamScore"); // stringified number
   const hasAudio = searchParams.get("hasAudio"); // string: "true"/"false"
+  const date = searchParams.get("date"); // string: "YYYY-MM-DD"
+  const startDate = searchParams.get("startDate");
+  const endDate = searchParams.get("endDate");
 
   await connectMongoDB();
 
@@ -60,11 +63,20 @@ export async function GET(request: { url: string; }) {
   if (type) filters.type = type;
   if (tag) filters.tags = { $in: [tag] };
   if (mood) filters.mood = mood;
-  if (recurring !== null) filters.recurring = recurring === "true";
-  if (dreamScore !== null) filters.dreamScore = { $gte: Number(dreamScore) };
+  if (recurring) filters.recurring = recurring === "true";
+  if (dreamScore && Number(dreamScore) > 0) filters.dreamScore = { $gte: Number(dreamScore) };
   if (hasAudio === 'true') {
       filters.audioNote = { $exists: true, $ne: "" };
   }
+  if (date) {
+    const start = new Date(date + 'T00:00:00.000Z');
+    const end = new Date(date + 'T23:59:59.999Z');
+    filters.date = { $gte: start, $lte: end };
+  } else if (startDate && endDate) {
+    const start = new Date(startDate + 'T00:00:00.000Z');
+    const end = new Date(endDate + 'T23:59:59.999Z');
+    filters.date = { $gte: start, $lte: end };
+}
 
   // Count total dreams for pagination
   const totalDreams = await Dream.countDocuments(filters);
@@ -72,7 +84,7 @@ export async function GET(request: { url: string; }) {
 
   // Get dreams with pagination
   const dreams = await Dream.find(filters)
-    .sort({ createdAt: -1 })
+    .sort({ date: -1 })
     .skip(skip)
     .limit(limit)
     .lean(); 

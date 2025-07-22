@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import DreamList from "./DreamList";
 import Calendar from "./calendar/Calendar";
+import { Dream } from "@/types/Dream";
 
 export default function DreamFilterUI() {
   const [type, setType] = useState("");
@@ -12,7 +13,18 @@ export default function DreamFilterUI() {
   const [tags, setTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [hasAudio, setHasAudio] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<{date: Date, dreams: Dream[]} | null>(null);
+
+  const handleDateSelected = (date: Date, dreams: Dream[]) => {
+    console.log('🎯 DreamFilterUI reçoit:', date, dreams);
+    setSelectedDate({ date, dreams });
+    document.getElementById("dream-list")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const clearDateFilter = () => {
+    setSelectedDate(null);
+  }
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-8 px-4">
@@ -28,8 +40,31 @@ export default function DreamFilterUI() {
         <div className={`transition-all duration-300 overflow-hidden ${
           showCalendar ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
         }`}>
-          <Calendar />
+          <Calendar onDateSelected={handleDateSelected}/>
         </div>
+
+        {selectedDate && selectedDate.date && (
+          <div className="mb-4 p-3 bg-indigo-900/50 border border-indigo-500 rounded-md">
+            <div className="flex items-center justify-between">
+              <span className="text-indigo-200 text-sm">
+                📅 {selectedDate.date.toLocaleDateString('fr-FR', { 
+                  weekday: 'long', 
+                  day: 'numeric', 
+                  month: 'long' 
+                })}
+              </span>
+              <button 
+                onClick={clearDateFilter}
+                className="text-indigo-300 hover:text-white text-sm"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="text-indigo-300 text-xs mt-1">
+              {selectedDate.dreams?.length || 0} rêve(s) ce jour
+            </div>
+          </div>
+        )}
         
         <button
           className="lg:hidden mb-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md transition-colors"
@@ -145,6 +180,7 @@ export default function DreamFilterUI() {
           mood={mood}
           tags={tags}
           hasAudio={hasAudio}
+          selectedDate={selectedDate?.date}
         />
       </div>
     </div>

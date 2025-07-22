@@ -15,6 +15,7 @@ interface DreamListProps {
   mood?: string;
   tags?: string[]; 
   hasAudio?: boolean;
+  selectedDate?: Date | null;
 }
 
 interface PaginationData {
@@ -26,7 +27,7 @@ interface PaginationData {
   limit: number;
 }
 
-export default function DreamList({ type, recurring, dreamScore, mood, tags, hasAudio }: DreamListProps) {
+export default function DreamList({ type, recurring, dreamScore, mood, tags, hasAudio, selectedDate }: DreamListProps) {
   const [dreams, setDreams] = useState<Dream[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<PaginationData>({
@@ -59,6 +60,15 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
           params.append("tag", tags[0]); 
         }
         if (hasAudio !== undefined) params.append("hasAudio", String(hasAudio));
+        // date filter
+        if (selectedDate) {
+          const year = selectedDate.getFullYear();
+          const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+          const day = selectedDate.getDate().toString().padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`; // "2025-07-15"
+          
+          params.append('date', dateStr);
+        }
 
         const res = await fetch(`${baseUrl}/api/dreams?${params.toString()}`, {
           cache: "no-cache",
@@ -66,11 +76,16 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
         });
 
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
         const data = await res.json();
-        setDreams(data.dreams || []);
-        setPagination(data.pagination);
-        setDreams(data.body || []);
+          setDreams(data.body || data.dreams || []);
+          setPagination(data.pagination || {
+            currentPage: 1,
+            totalPages: 1,
+            totalDreams: 0,
+            hasNextPage: false,
+            hasPreviousPage: false,
+            limit: 10
+        });
       } catch (err) {
         console.error("Error fetching dreams:", err);
       } finally {
@@ -80,7 +95,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
 
   useEffect(() => {
     fetchDreams(1); // Reset to page 1 on new filters
-  }, [type, recurring, dreamScore, mood, tags, hasAudio]);
+  }, [type, recurring, dreamScore, mood, tags, hasAudio, selectedDate]);
 
   const handlePageChange = (page: number) => {
     fetchDreams(page);
@@ -149,7 +164,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
                            transition-all duration-300 flex flex-col
                            h-auto max-w-3xl w-full overflow-hidden"
               >
-                <h4>Rêve du {new Date(dream.createdAt).toLocaleDateString("fr-FR")}</h4>
+                <h4>Rêve du {new Date(dream.date).toLocaleDateString("fr-FR")}</h4>
                 <Link href={`/viewDream/${dream._id}`}>
                   <h2 className="text-2xl font-bold text-white mb-2 hover:text-indigo-400 transition cursor-pointer line-clamp-1">
                     {dream.title}
