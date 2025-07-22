@@ -61,7 +61,9 @@ export default function DreamFilterUI() {
               </button>
             </div>
             <div className="text-indigo-300 text-xs mt-1">
-              {selectedDate.dreams?.length || 0} rêve(s) ce jour
+              <span>
+                Cliquez sur la croix pour supprimer le filtre de date
+              </span>
             </div>
           </div>
         )}

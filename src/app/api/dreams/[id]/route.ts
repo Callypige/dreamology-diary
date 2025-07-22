@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-/// Parses a date string in ISO format or other formats supported by the Date constructor.
 function parseDate(value: string): Date | undefined {
   const date = new Date(value);
   return isNaN(date.valueOf()) ? undefined : date;
@@ -12,7 +11,7 @@ function parseDate(value: string): Date | undefined {
 
 // 📝 PUT - Update a specific dream
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+  const params = await props.params; // ← Await les params
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -21,12 +20,18 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
   const { id } = params;
   const body = await request.json();
 
+  console.log('🔍 PUT Received ID:', id); // Debug
+
+  if (!id || id === 'undefined') {
+    return NextResponse.json({ error: "Invalid dream ID" }, { status: 400 });
+  }
+
   await connectMongoDB();
 
   const updateData = {
     ...body,
-    sleepTime: parseDate(body.sleepTime),
-    wokeUpTime: parseDate(body.wokeUpTime),
+    sleepTime: body.sleepTime ? parseDate(body.sleepTime) : undefined,
+    wokeUpTime: body.wokeUpTime ? parseDate(body.wokeUpTime) : undefined,
   };
 
   const updated = await Dream.findOneAndUpdate(
@@ -43,13 +48,20 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
 }
 
 // 📥 GET - Retrieve a specific dream
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await params;
+  const params = await props.params; // ← Await les params
+  const { id } = params;
+
+  console.log('🔍 Received ID:', id); // Debug
+
+  if (!id || id === 'undefined') {
+    return NextResponse.json({ error: "Invalid dream ID" }, { status: 400 });
+  }
 
   await connectMongoDB();
 

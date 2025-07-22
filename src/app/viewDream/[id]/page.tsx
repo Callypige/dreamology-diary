@@ -225,7 +225,7 @@ export default function DreamDetails() {
           </div>
           <div className="text-center">
             <Link 
-              href="/dreams" 
+              href="/" 
               className="inline-flex items-center text-indigo-400 hover:text-indigo-300 transition"
             >
               <TbArrowBackUp className="mr-2" />
