@@ -18,7 +18,7 @@ export default function Navbar() {
           className="text-2xl md:text-3xl font-extrabold text-white tracking-wide drop-shadow-lg"
         >
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-yellow-300">
-            DreamologyTools
+            Somni Dreamology
           </span>
         </Link>
 
