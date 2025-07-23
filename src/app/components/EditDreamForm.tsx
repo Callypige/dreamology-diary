@@ -87,16 +87,15 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
           setNewDate(dateStr);
         }
 
-        // Handle times (convert from Date to datetime-local format)
         if (dream.sleepTime) {
           const sleepTime = new Date(dream.sleepTime);
-          const sleepTimeStr = sleepTime.toISOString().slice(0, 16);
+          const sleepTimeStr = `${sleepTime.getHours().toString().padStart(2, '0')}:${sleepTime.getMinutes().toString().padStart(2, '0')}`;
           setNewSleepTime(sleepTimeStr);
         }
 
         if (dream.wokeUpTime) {
           const wokeUpTime = new Date(dream.wokeUpTime);
-          const wokeUpTimeStr = wokeUpTime.toISOString().slice(0, 16);
+          const wokeUpTimeStr = `${wokeUpTime.getHours().toString().padStart(2, '0')}:${wokeUpTime.getMinutes().toString().padStart(2, '0')}`;
           setNewWokeUpTime(wokeUpTimeStr);
         }
 
@@ -237,6 +236,25 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
               onChange={(e) => setNewDate(e.target.value)}
               className={inputClass}
             />
+          </div>
+          {/* Sleep Time Section */}
+          <div>
+              <label className={labelClass}>Heure de coucher</label>
+              <input
+                type="time"
+                value={newSleepTime}
+                onChange={(e) => setNewSleepTime(e.target.value)}
+                className={inputClass}
+              />
+          </div>
+          <div>
+              <label className={labelClass}>Heure de réveil</label>
+              <input
+                type="time"
+                value={newWokeUpTime}
+                onChange={(e) => setNewWokeUpTime(e.target.value)}
+                className={inputClass}
+              />
           </div>
         </div>
       </div>

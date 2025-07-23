@@ -62,32 +62,40 @@ export async function GET() {
             }
         });
 
-        // 7. Bedtime average
+            // 7. Bedtime average - CORRIGÉ avec fuseau horaire
         const averageSleepTime = await Dream.aggregate([
-            { $match: { 
-                user: userId,
-                sleepTime: { $exists: true, $ne: null }
-            }},
-            { $group: { 
-                _id: null, 
-                averageHour: { $avg: { $hour: "$sleepTime" }},
-                averageMinute: { $avg: { $minute: "$sleepTime" }},
-                count: { $sum: 1 }
-            }}
+        { $match: { 
+            user: userId,
+            sleepTime: { $exists: true, $ne: null }
+        }},
+        { $addFields: {
+            // Convertir en heure locale (UTC+2 pour la France en été)
+            localSleepTime: { $add: ["$sleepTime", 2 * 60 * 60 * 1000] } // +2h en millisecondes
+        }},
+        { $group: { 
+            _id: null, 
+            averageHour: { $avg: { $hour: "$localSleepTime" }},
+            averageMinute: { $avg: { $minute: "$localSleepTime" }},
+            count: { $sum: 1 }
+        }}
         ]);
 
-        // 8. Woke up time average
+        // 8. Woke up time average - CORRIGÉ avec fuseau horaire
         const averageWakeTime = await Dream.aggregate([
-            { $match: { 
-                user: userId,
-                wokeUpTime: { $exists: true, $ne: null }
-            }},
-            { $group: { 
-                _id: null, 
-                averageHour: { $avg: { $hour: "$wokeUpTime" }},
-                averageMinute: { $avg: { $minute: "$wokeUpTime" }},
-                count: { $sum: 1 }
-            }}
+        { $match: { 
+            user: userId,
+            wokeUpTime: { $exists: true, $ne: null }
+        }},
+        { $addFields: {
+            // Convertir en heure locale (UTC+2 pour la France en été)
+            localWakeTime: { $add: ["$wokeUpTime", 2 * 60 * 60 * 1000] } // +2h en millisecondes
+        }},
+        { $group: { 
+            _id: null, 
+            averageHour: { $avg: { $hour: "$localWakeTime" }},
+            averageMinute: { $avg: { $minute: "$localWakeTime" }},
+            count: { $sum: 1 }
+        }}
         ]);
 
         // 9. Moods top 5
