@@ -38,7 +38,7 @@ export default function EditNameForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="text-black">Nom</label>
+        <label className="text-white">Nom</label>
         <input
           type="text"
           value={name}
@@ -47,7 +47,7 @@ export default function EditNameForm({
         />
       </div>
       <div>
-        <label className="text-black">Bio</label>
+        <label className="text-white">Bio</label>
         <textarea
           value={bio}
           onChange={(e) => setBio(e.target.value)}
@@ -55,7 +55,7 @@ export default function EditNameForm({
         />
       </div>
       <div>
-        <label className="text-black">Localisation</label>
+        <label className="text-white">Localisation</label>
         <input
           type="text"
           value={location}
@@ -64,7 +64,7 @@ export default function EditNameForm({
         />
       </div>
       <div>
-        <label className="text-black">Avatar URL</label>
+        <label className="text-white">Avatar URL</label>
         <input
           type="text"
           value={avatarUrl}
