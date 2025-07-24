@@ -53,11 +53,6 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     }
   });
 
-  console.log('🔍 UpdateData processed:', {
-    sleepTime: updateData.sleepTime,
-    wokeUpTime: updateData.wokeUpTime
-  }); 
-
   const updated = await Dream.findOneAndUpdate(
     { _id: id, user: session.user.id },
     updateData,
@@ -80,8 +75,6 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
 
   const params = await props.params;
   const { id } = params;
-
-  console.log('🔍 Received ID:', id);
 
   if (!id || id === 'undefined') {
     return NextResponse.json({ error: "Invalid dream ID" }, { status: 400 });

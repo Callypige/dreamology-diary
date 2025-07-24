@@ -192,10 +192,8 @@ export default function Calendar({ onDateSelected }: {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log('🖱️ onClick déclenché pour le jour:', day.dayNumber);
                   handleDayClick(day.date);
                 }}
-                onMouseEnter={() => console.log('🐭 Hover sur le jour:', day.dayNumber)}
                 >
 
                   <div className={`text-[10px] md:text-sm font-medium leading-tight ${

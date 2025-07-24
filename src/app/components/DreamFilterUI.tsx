@@ -17,7 +17,6 @@ export default function DreamFilterUI() {
   const [selectedDate, setSelectedDate] = useState<{date: Date, dreams: Dream[]} | null>(null);
 
   const handleDateSelected = (date: Date, dreams: Dream[]) => {
-    console.log('🎯 DreamFilterUI reçoit:', date, dreams);
     setSelectedDate({ date, dreams });
     document.getElementById("dream-list")?.scrollIntoView({ behavior: "smooth" });
   };
