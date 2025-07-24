@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   await connectMongoDB();
-  const Profile = (await import("@/models/profile")).default;
+  const Profile = (await import("@/models/Profile")).default;
 
   let profile = await Profile.findOne({ user: session.user.id });
 
@@ -36,7 +36,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   await connectMongoDB();
-  const Profile = (await import("@/models/profile")).default;
+  const Profile = (await import("@/models/Profile")).default;
 
   const { name, bio, location, avatarUrl } = await request.json();
 
