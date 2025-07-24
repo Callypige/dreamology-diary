@@ -1,7 +1,7 @@
 "use client";
 
 import { Dream } from "@/types/Dream";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function Calendar({ onDateSelected }: { 
   onDateSelected?: (date: Date, dreams: Dream[]) => void 
@@ -25,11 +25,7 @@ export default function Calendar({ onDateSelected }: {
     }
   }
 
-  useEffect(() => {
-    fetchDreams();
-  }, [currentDate]);
-
-  const fetchDreams = async () => {
+  const fetchDreams = useCallback(async () => {
     setLoading(true);
     try {
       const year = currentDate.getFullYear();
@@ -57,44 +53,48 @@ export default function Calendar({ onDateSelected }: {
     } finally {
       setLoading(false);
     }
+  }, [currentDate]);
+
+  useEffect(() => {
+    fetchDreams();
+  }, [fetchDreams]);
+
+  const generateCalendarDays = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    const firstDay = new Date(year, month, 1);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    const days = [];
+    const currentDay = new Date(startDate);
+    
+    for (let i = 0; i < 42; i++) {
+      // VERSION CORRIGÉE - éviter les fuseaux horaires
+      const year = currentDay.getFullYear();
+      const month = (currentDay.getMonth() + 1).toString().padStart(2, '0');
+      const day = currentDay.getDate().toString().padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`; // "2025-07-10"
+      
+      const dayDreams = dreams.filter(dream => {
+        const dreamDateString = dream.date.split('T')[0]; // "2025-07-10"
+        return dreamDateString === dateString;
+      });
+
+      days.push({
+        date: new Date(currentDay),
+        dayNumber: currentDay.getDate(),
+        isCurrentMonth: currentDay.getMonth() === currentDate.getMonth(),
+        dreams: dayDreams,
+        dateString: dateString
+      });
+
+      currentDay.setDate(currentDay.getDate() + 1);
+    }
+
+    return days;
   };
-
-    const generateCalendarDays = () => {
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
-      
-      const firstDay = new Date(year, month, 1);
-      const startDate = new Date(firstDay);
-      startDate.setDate(startDate.getDate() - firstDay.getDay());
-      
-      const days = [];
-      const currentDay = new Date(startDate);
-      
-      for (let i = 0; i < 42; i++) {
-        // VERSION CORRIGÉE - éviter les fuseaux horaires
-        const year = currentDay.getFullYear();
-        const month = (currentDay.getMonth() + 1).toString().padStart(2, '0');
-        const day = currentDay.getDate().toString().padStart(2, '0');
-        const dateString = `${year}-${month}-${day}`; // "2025-07-10"
-        
-        const dayDreams = dreams.filter(dream => {
-          const dreamDateString = dream.date.split('T')[0]; // "2025-07-10"
-          return dreamDateString === dateString;
-        });
-
-        days.push({
-          date: new Date(currentDay),
-          dayNumber: currentDay.getDate(),
-          isCurrentMonth: currentDay.getMonth() === currentDate.getMonth(),
-          dreams: dayDreams,
-          dateString: dateString
-        });
-
-        currentDay.setDate(currentDay.getDate() + 1);
-      }
-
-      return days;
-    };
 
   const calendarDays = generateCalendarDays();
 

@@ -1,20 +1,17 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import Image from "next/image";
 import DreamFilterUI from "./components/DreamFilterUI";
 
+import { Session } from "next-auth";
+
 export default async function Home() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions) as Session | null;
 
-  let profileName = null;
   if (session?.user?.id) {
-    const connectMongoDB = (await import("@/libs/mongodb")).default;
-    const Profile = (await import("@/models/profile")).default;
-
+    const connectMongoDB = (await import("@/lib/mongodb")).default;
     await connectMongoDB();
-    const profile = await Profile.findOne({ user: session.user.id });
-    profileName = profile?.name || null;
   }
 
   return (
@@ -58,7 +55,7 @@ export default async function Home() {
                 href="/signup"
                 className="px-6 py-3 bg-orange-600 rounded-md hover:bg-orange-400 transition"
               >
-                S'inscrire
+                S’inscrire
               </Link>
             </div>
           </>

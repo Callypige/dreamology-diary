@@ -1,10 +1,10 @@
-import connectMongoDB from "@/libs/mongodb";
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import connectMongoDB from "@/lib/mongodb";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions) as { user?: { id?: string; name?: string; email?: string } } | null;
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -29,8 +29,8 @@ export async function GET() {
   return NextResponse.json(profile, { status: 200 });
 }
 
-export async function PATCH(request: { json: () => any }) {
-  const session = await getServerSession(authOptions);
+export async function PATCH(request: NextRequest) {
+  const session = await getServerSession(authOptions) as { user?: { id?: string; name?: string; email?: string } } | null;
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

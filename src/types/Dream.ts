@@ -22,5 +22,4 @@ export interface Dream {
   private: boolean;
   date: string; // ISO date string
   interpretation?: string; // optional interpretation of the dream
-  [key: string]: any;
 }

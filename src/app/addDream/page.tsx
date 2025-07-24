@@ -6,9 +6,37 @@ import Link from "next/link";
 import { TbArrowBackUp, TbChevronDown, TbChevronUp } from "react-icons/tb";
 import VoiceRecorder from "../components/audio/VoiceRecorder";
 
+interface DreamFormData {
+  title: string;
+  description: string;
+  type: "rêve" | "cauchemar" | "lucide" | "autre";
+  date: string;
+  intensity: string;
+  mood: string;
+  lucidity: boolean;
+  dreamClarity: string;
+  characters: string;
+  location: string;
+  tags: string;
+  interpretation: string;
+  beforeSleepMood: string;
+  sleepTime: string;
+  wokeUpTime: string;
+  dreamScore: string;
+  audioNote: string;
+  images: string;
+  private: boolean;
+}
+
+// Type pour les clés des sections
+type SectionKey = 'details' | 'organization' | 'sleep' | 'audio' | 'other';
+
+// Types React natifs pour les événements
+import { ChangeEvent, FormEvent } from "react";
+
 export default function AddDream() {
   // Helper function to get today's date in YYYY-MM-DD format
-  const getTodayDate = () => {
+  const getTodayDate = (): string => {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -16,11 +44,11 @@ export default function AddDream() {
     return `${year}-${month}-${day}`;
   };
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<DreamFormData>({
     title: "",
     description: "",
     type: "rêve",
-    date: getTodayDate(), // ✅ Date d'aujourd'hui par défaut
+    date: getTodayDate(),
     intensity: "",
     mood: "",
     lucidity: false,
@@ -39,7 +67,7 @@ export default function AddDream() {
   });
 
   // Collapsible sections state
-  const [expandedSections, setExpandedSections] = useState({
+  const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     details: false,
     organization: false,
     sleep: false,
@@ -47,25 +75,28 @@ export default function AddDream() {
     other: false
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const router = useRouter();
 
-  const toggleSection = (section) => {
+  const toggleSection = (section: SectionKey): void => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
     }));
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
+    const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    const { name, value, type } = target;
+    const checked = (target as HTMLInputElement).checked;
+    
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -90,6 +121,11 @@ export default function AddDream() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Fonction pour gérer le changement d'audio
+  const handleAudioChange = (url: string): void => {
+    setFormData({ ...formData, audioNote: url });
   };
 
   const inputClass = "w-full p-3 rounded-xl bg-slate-800 text-white placeholder-gray-400 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500";
@@ -238,7 +274,7 @@ export default function AddDream() {
                   onChange={handleChange}
                   className="w-5 h-5 accent-indigo-500"
                 />
-                <label className="text-white font-medium">C'était un rêve lucide</label>
+                <label className="text-white font-medium">C&#39;était un rêve lucide</label>
               </div>
             </div>
           )}
@@ -348,7 +384,7 @@ export default function AddDream() {
             <div className="p-4 bg-slate-800">
               <VoiceRecorder
                 existingAudioUrl={formData.audioNote}
-                onAudioChange={(url) => setFormData({ ...formData, audioNote: url })}
+                onAudioChange={handleAudioChange}
                 dreamId={undefined}
               />
             </div>

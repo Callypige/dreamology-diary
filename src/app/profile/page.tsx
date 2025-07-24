@@ -3,8 +3,15 @@ import { useState, useEffect } from "react";
 import EditNameForm from "./EditNameForm";
 import DreamStat from "../components/profile/Dreamstat";
 
+interface Profile {
+  id: string;
+  name: string;
+  email: string;
+  [key: string]: string | number | boolean | undefined;
+}
+
 export default function ProfilePage() {
-    const [profile, setProfile] = useState<any>(null);
+    const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
     const [showInfoProfile, setShowInfoProfile] = useState(false);
 

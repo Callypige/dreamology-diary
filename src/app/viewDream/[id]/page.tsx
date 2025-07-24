@@ -5,21 +5,48 @@ import Link from "next/link";
 import { TbArrowBackUp, TbChevronDown, TbChevronUp } from "react-icons/tb";
 import { useParams } from "next/navigation";
 
+// Interface pour le rêve avec _id MongoDB
+interface DreamData {
+  _id: string;
+  title: string;
+  description: string;
+  type: string;
+  date: string;
+  intensity?: number;
+  mood?: string;
+  lucidity?: boolean;
+  dreamClarity?: number;
+  characters?: string[];
+  location?: string;
+  tags?: string[];
+  interpretation?: string;
+  beforeSleepMood?: string;
+  sleepTime?: string;
+  wokeUpTime?: string;
+  dreamScore?: number;
+  audioNote?: string;
+  private: boolean;
+  recurring?: boolean;
+}
+
+// Type pour les clés des sections
+type SectionKey = 'immersion' | 'sleep' | 'extras';
+
 export default function DreamDetails() {
   const { id } = useParams();
-  const [dream, setDream] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [dream, setDream] = useState<DreamData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
   
-  // Collapsible sections state
-  const [expandedSections, setExpandedSections] = useState({
+  // Collapsible sections state avec type strict
+  const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     immersion: false,
     sleep: false,
     extras: false
   });
 
   useEffect(() => {
-    const fetchDream = async () => {
+    const fetchDream = async (): Promise<void> => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
@@ -34,7 +61,7 @@ export default function DreamDetails() {
         setDream(data.dream);
       } catch (err) {
         console.error("Error fetching dream:", err);
-        setError(err);
+        setError(err as Error);
       } finally {
         setLoading(false);
       }
@@ -43,7 +70,7 @@ export default function DreamDetails() {
     if (id) fetchDream();
   }, [id]);
 
-  const toggleSection = (section: string) => {
+  const toggleSection = (section: SectionKey): void => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
@@ -58,7 +85,7 @@ export default function DreamDetails() {
     return <p className="text-center text-white mt-12">Ce rêve est introuvable...</p>;
   }
 
-  const formatDate = (date) => {
+  const formatDate = (date: string): string => {
     return new Date(date).toLocaleString("fr-FR", {
       day: "2-digit",
       month: "2-digit",
@@ -116,8 +143,8 @@ export default function DreamDetails() {
                 <source src={dream.audioNote} type="audio/mpeg" />
                 Votre navigateur ne supporte pas la lecture audio.
               </audio>
-              <p className="text-xs text-gray-400">
-                💡 Si l'audio ne se charge pas, vérifiez que le fichier existe encore sur le serveur.
+              <p className="text-xs text-gray-400">clear
+                💡 Si lC&#39;audio ne se charge pas, vérifiez que le fichier existe encore sur le serveur.
               </p>
             </div>
           </div>
@@ -143,10 +170,10 @@ export default function DreamDetails() {
                   {dream.lucidity && <p>🔮 <strong>Lucide :</strong> {dream.lucidity ? "Oui" : "Non"}</p>}
                   {dream.recurring && <p>🔄 <strong>Récurrent :</strong> {dream.recurring ? "Oui" : "Non"}</p>}
                   {dream.location && <p>📍 <strong>Lieu :</strong> {dream.location}</p>}
-                  {dream.characters?.length > 0 && (
+                  {dream.characters?.length && dream.characters.length > 0 && (
                     <p className="md:col-span-2">🧑‍🤝‍🧑 <strong>Personnages :</strong> {dream.characters.join(", ")}</p>
                   )}
-                  {dream.tags?.length > 0 && (
+                  {dream.tags?.length && dream.tags.length > 0 && (
                     <div className="md:col-span-2">
                       <p className="mb-2">🔖 <strong>Tags :</strong></p>
                       <div className="flex flex-wrap gap-1">

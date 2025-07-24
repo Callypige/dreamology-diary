@@ -13,7 +13,6 @@ export default function VoiceRecorder({
   dreamId
 }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(existingAudioUrl || null);
   const [isUploading, setIsUploading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -101,7 +100,6 @@ export default function VoiceRecorder({
 
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        setAudioBlob(audioBlob);
         
         // Create temporary URL for immediate playback
         const tempUrl = URL.createObjectURL(audioBlob);
@@ -152,7 +150,6 @@ export default function VoiceRecorder({
     if (audioUrl && audioUrl.startsWith('blob:')) {
       URL.revokeObjectURL(audioUrl);
     }
-    setAudioBlob(null);
     setAudioUrl(null);
     setHasRecording(false);
     setIsPlaying(false);
@@ -189,7 +186,7 @@ export default function VoiceRecorder({
       {isUploading && (
         <div className="mb-4 p-3 bg-blue-600 text-white rounded-lg flex items-center gap-2">
           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          <span>Upload de l'audio...</span>
+          <span>Upload de l’audio...</span>
         </div>
       )}
 
@@ -210,7 +207,7 @@ export default function VoiceRecorder({
             disabled={isUploading}
             className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50 transition-colors"
           >
-            🎤 Commencer l'enregistrement
+            🎤 Commencer l’enregistrement
           </button>
         ) : (
           <button
@@ -218,7 +215,7 @@ export default function VoiceRecorder({
             onClick={stopRecording}
             className="bg-red-800 hover:bg-red-900 text-white px-4 py-2 rounded-lg font-medium transition-colors"
           >
-            ⏹️ Arrêter l'enregistrement
+            ⏹️ Arrêter l’enregistrement
           </button>
         )}
 

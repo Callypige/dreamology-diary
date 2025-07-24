@@ -176,7 +176,7 @@ export default function DreamStat() {
                         😊 Humeurs les plus fréquentes
                     </h3>
                     {stats.topMoods.length === 0 ? (
-                        <p className="text-gray-400 italic">Aucune humeur renseignée pour l'instant</p>
+                        <p className="text-gray-400 italic">Aucune humeur renseignée pour l’instant</p>
                     ) : (
                         <ul className="space-y-2">
                             {stats.topMoods.map((mood, index) => (
@@ -197,7 +197,7 @@ export default function DreamStat() {
                         🏷️ Tags les plus utilisés
                     </h3>
                     {stats.topTags.length === 0 ? (
-                        <p className="text-gray-400 italic">Pas de tags pour l'instant</p>
+                        <p className="text-gray-400 italic">Pas de tags pour l’instant</p>
                     ) : (
                         <ul className="space-y-2">
                             {stats.topTags.map((tag, index) => (

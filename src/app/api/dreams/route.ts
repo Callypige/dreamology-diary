@@ -1,8 +1,8 @@
-import connectMongoDB from "@/libs/mongodb";
+import connectMongoDB from "@/lib/mongodb";
 import Dream from "@/models/Dream";
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 function toDateFromHHMM(hhmm: string | undefined) {
   if (!hhmm) return undefined;
@@ -12,7 +12,7 @@ function toDateFromHHMM(hhmm: string | undefined) {
   return d;
 }
 
-export async function POST(request: { json: () => any; }) {
+export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -22,8 +22,12 @@ export async function POST(request: { json: () => any; }) {
   const body = await request.json();
 
   await connectMongoDB();
-  await Dream.create({ ...body,sleepTime : toDateFromHHMM(body.sleepTime),
-    wokeUpTime: toDateFromHHMM(body.wokeUpTime), user: userId });
+  await Dream.create({
+    ...body,
+    sleepTime: toDateFromHHMM(body.sleepTime),
+    wokeUpTime: toDateFromHHMM(body.wokeUpTime),
+    user: userId,
+  });
 
   return NextResponse.json(
     { message: "Dream added successfully" },
@@ -31,7 +35,7 @@ export async function POST(request: { json: () => any; }) {
   );
 }
 
-export async function GET(request: { url: string; }) {
+export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -57,7 +61,7 @@ export async function GET(request: { url: string; }) {
 
   await connectMongoDB();
 
-  const filters: any = { user: session.user.id }; 
+  const filters: Record<string, unknown> = { user: session.user.id };
 
   // Build filters based on query parameters
   if (type) filters.type = type;
@@ -102,7 +106,7 @@ export async function GET(request: { url: string; }) {
   return NextResponse.json({ body: dreams, pagination }, { status: 200 });
 }
 
-export async function DELETE(request: { nextUrl: { searchParams: { get: (arg0: string) => any; }; }; }) {
+export async function DELETE(request: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session) {

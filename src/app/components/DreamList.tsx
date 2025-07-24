@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { HiPencilAlt } from "react-icons/hi";
 import RemoveBtn from "./RemoveBtn";
@@ -27,8 +27,14 @@ interface PaginationData {
   limit: number;
 }
 
+// Interface étendue pour les rêves avec _id MongoDB
+interface DreamWithMongoId extends Omit<Dream, 'id'> {
+  _id: string;
+  id?: string; // Optionnel pour compatibilité
+}
+
 export default function DreamList({ type, recurring, dreamScore, mood, tags, hasAudio, selectedDate }: DreamListProps) {
-  const [dreams, setDreams] = useState<Dream[]>([]);
+  const [dreams, setDreams] = useState<DreamWithMongoId[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<PaginationData>({
     currentPage: 1,
@@ -39,63 +45,66 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
     limit: 10, // Default limit
   });
 
-    const fetchDreams = async (page: number = 1 ) => {
-      try {
-        setLoading(true);
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-        const params = new URLSearchParams();
+    const fetchDreams = useCallback(
+      async (page: number = 1) => {
+        try {
+          setLoading(true);
+          const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+          const params = new URLSearchParams();
 
-        // pagination params
-        params.append("page", String(page));
-        params.append("limit", "10"); // Default limit
+          // pagination params
+          params.append("page", String(page));
+          params.append("limit", "10"); // Default limit
 
-        // filter params
-        if (type) params.append("type", type);
-        if (recurring !== undefined) params.append("recurring", String(recurring));
-        if (dreamScore !== undefined && dreamScore > 0) {
-          params.append("dreamScore", String(dreamScore));
+          // filter params
+          if (type) params.append("type", type);
+          if (recurring !== undefined) params.append("recurring", String(recurring));
+          if (dreamScore !== undefined && dreamScore > 0) {
+            params.append("dreamScore", String(dreamScore));
+          }
+          if (mood) params.append("mood", mood);
+          if (tags && tags.length > 0 && tags[0]) { 
+            params.append("tag", tags[0]); 
+          }
+          if (hasAudio !== undefined) params.append("hasAudio", String(hasAudio));
+          // date filter
+          if (selectedDate) {
+            const year = selectedDate.getFullYear();
+            const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+            const day = selectedDate.getDate().toString().padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`; // "2025-07-15"
+            
+            params.append('date', dateStr);
+          }
+
+          const res = await fetch(`${baseUrl}/api/dreams?${params.toString()}`, {
+            cache: "no-cache",
+            credentials: "include",
+          });
+
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+            setDreams(data.body || data.dreams || []);
+            setPagination(data.pagination || {
+              currentPage: 1,
+              totalPages: 1,
+              totalDreams: 0,
+              hasNextPage: false,
+              hasPreviousPage: false,
+              limit: 10
+          });
+        } catch (err) {
+          console.error("Error fetching dreams:", err);
+        } finally {
+          setLoading(false);
         }
-        if (mood) params.append("mood", mood);
-        if (tags && tags.length > 0 && tags[0]) { 
-          params.append("tag", tags[0]); 
-        }
-        if (hasAudio !== undefined) params.append("hasAudio", String(hasAudio));
-        // date filter
-        if (selectedDate) {
-          const year = selectedDate.getFullYear();
-          const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
-          const day = selectedDate.getDate().toString().padStart(2, '0');
-          const dateStr = `${year}-${month}-${day}`; // "2025-07-15"
-          
-          params.append('date', dateStr);
-        }
-
-        const res = await fetch(`${baseUrl}/api/dreams?${params.toString()}`, {
-          cache: "no-cache",
-          credentials: "include",
-        });
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-          setDreams(data.body || data.dreams || []);
-          setPagination(data.pagination || {
-            currentPage: 1,
-            totalPages: 1,
-            totalDreams: 0,
-            hasNextPage: false,
-            hasPreviousPage: false,
-            limit: 10
-        });
-      } catch (err) {
-        console.error("Error fetching dreams:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      },
+      [type, recurring, dreamScore, mood, tags, hasAudio, selectedDate]
+    );
 
   useEffect(() => {
     fetchDreams(1); // Reset to page 1 on new filters
-  }, [type, recurring, dreamScore, mood, tags, hasAudio, selectedDate]);
+  }, [fetchDreams]);
 
   const handlePageChange = (page: number) => {
     fetchDreams(page);

@@ -1,8 +1,8 @@
-import connectMongoDB from "@/libs/mongodb";
+import connectMongoDB from "@/lib/mongodb";
 import Dream from "@/models/Dream"
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import mongoose from "mongoose";
 
 export async function GET() {
@@ -38,11 +38,14 @@ export async function GET() {
             type: "cauchemar"
         });
 
-        // 5. Score moyen
+        // 5. Score moyen - CORRIGÉ: utilise $nin au lieu de deux $ne
         const dreamScoreResult = await Dream.aggregate([
             { $match: { 
                 user: userId,
-                dreamScore: { $exists: true, $ne: null, $ne: "null" }
+                dreamScore: { 
+                    $exists: true, 
+                    $nin: [null, "null", "", 0] // Exclut null, "null", chaîne vide et 0
+                }
             }},
             { $group: { 
                 _id: null, 
@@ -56,53 +59,61 @@ export async function GET() {
             user: userId,
             audioNote: { 
                 $exists: true, 
-                $ne: "", 
-                $ne: null,
+                $nin: ["", null], // Utilise $nin au lieu de multiples $ne
                 $regex: /\.(webm|mp3|wav|m4a)$/i // Regex to match common audio file extensions
             }
         });
 
-            // 7. Bedtime average - CORRIGÉ avec fuseau horaire
+        // 7. Bedtime average - CORRIGÉ avec fuseau horaire
         const averageSleepTime = await Dream.aggregate([
-        { $match: { 
-            user: userId,
-            sleepTime: { $exists: true, $ne: null }
-        }},
-        { $addFields: {
-            // Convertir en heure locale (UTC+2 pour la France en été)
-            localSleepTime: { $add: ["$sleepTime", 2 * 60 * 60 * 1000] } // +2h en millisecondes
-        }},
-        { $group: { 
-            _id: null, 
-            averageHour: { $avg: { $hour: "$localSleepTime" }},
-            averageMinute: { $avg: { $minute: "$localSleepTime" }},
-            count: { $sum: 1 }
-        }}
+            { $match: { 
+                user: userId,
+                sleepTime: { 
+                    $exists: true, 
+                    $ne: null 
+                }
+            }},
+            { $addFields: {
+                // Convertir en heure locale (UTC+2 pour la France en été)
+                localSleepTime: { $add: ["$sleepTime", 2 * 60 * 60 * 1000] } // +2h en millisecondes
+            }},
+            { $group: { 
+                _id: null, 
+                averageHour: { $avg: { $hour: "$localSleepTime" }},
+                averageMinute: { $avg: { $minute: "$localSleepTime" }},
+                count: { $sum: 1 }
+            }}
         ]);
 
         // 8. Woke up time average - CORRIGÉ avec fuseau horaire
         const averageWakeTime = await Dream.aggregate([
-        { $match: { 
-            user: userId,
-            wokeUpTime: { $exists: true, $ne: null }
-        }},
-        { $addFields: {
-            // Convertir en heure locale (UTC+2 pour la France en été)
-            localWakeTime: { $add: ["$wokeUpTime", 2 * 60 * 60 * 1000] } // +2h en millisecondes
-        }},
-        { $group: { 
-            _id: null, 
-            averageHour: { $avg: { $hour: "$localWakeTime" }},
-            averageMinute: { $avg: { $minute: "$localWakeTime" }},
-            count: { $sum: 1 }
-        }}
+            { $match: { 
+                user: userId,
+                wokeUpTime: { 
+                    $exists: true, 
+                    $ne: null 
+                }
+            }},
+            { $addFields: {
+                // Convertir en heure locale (UTC+2 pour la France en été)
+                localWakeTime: { $add: ["$wokeUpTime", 2 * 60 * 60 * 1000] } // +2h en millisecondes
+            }},
+            { $group: { 
+                _id: null, 
+                averageHour: { $avg: { $hour: "$localWakeTime" }},
+                averageMinute: { $avg: { $minute: "$localWakeTime" }},
+                count: { $sum: 1 }
+            }}
         ]);
 
         // 9. Moods top 5
         const topMoods = await Dream.aggregate([
             { $match: { 
                 user: userId,
-                mood: { $exists: true, $ne: "", $ne: null }
+                mood: { 
+                    $exists: true, 
+                    $nin: ["", null] // Utilise $nin au lieu de multiples $ne
+                }
             }},
             { $group: { _id: "$mood", count: { $sum: 1 } } },
             { $sort: { count: -1 } },
@@ -113,11 +124,16 @@ export async function GET() {
         const topTags = await Dream.aggregate([
             { $match: { 
                 user: userId,
-                tags: { $exists: true, $ne: [], $ne: null }
+                tags: { 
+                    $exists: true, 
+                    $nin: [[], null] // Utilise $nin au lieu de multiples $ne
+                }
             }},
             { $unwind: "$tags" },
             { $match: { 
-                tags: { $ne: "", $ne: null }
+                tags: { 
+                    $nin: ["", null] // Utilise $nin au lieu de multiples $ne
+                }
             }},
             { $group: { _id: "$tags", count: { $sum: 1 } } },
             { $sort: { count: -1 } },

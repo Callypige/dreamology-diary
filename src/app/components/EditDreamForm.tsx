@@ -9,36 +9,39 @@ interface EditDreamFormProps {
   id: string;
 }
 
+// Type pour les clés des sections
+type SectionKey = 'details' | 'organization' | 'sleep' | 'audio' | 'other';
+
 export default function EditDreamForm({ id }: EditDreamFormProps) {
   const router = useRouter();
 
   // Loading state
-  const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Form state
-  const [newTitle, setNewTitle] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [newMood, setNewMood] = useState("");
-  const [newLucidity, setNewLucidity] = useState(false);
-  const [newTags, setNewTags] = useState("");
-  const [newLocation, setNewLocation] = useState("");
-  const [newIntensity, setNewIntensity] = useState(5);
-  const [newRecurring, setNewRecurring] = useState(false);
-  const [newCharacters, setNewCharacters] = useState("");
-  const [newInterpretation, setNewInterpretation] = useState("");
-  const [newType, setNewType] = useState("rêve");
-  const [newBeforeSleepMood, setNewBeforeSleepMood] = useState("");
-  const [newSleepTime, setNewSleepTime] = useState("");
-  const [newWokeUpTime, setNewWokeUpTime] = useState("");
-  const [newDreamClarity, setNewDreamClarity] = useState(5);
-  const [newDreamScore, setNewDreamScore] = useState(5);
-  const [newAudioNote, setNewAudioNote] = useState("");
-  const [newPrivate, setNewPrivate] = useState(false);
-  const [newDate, setNewDate] = useState("");
+  const [newTitle, setNewTitle] = useState<string>("");
+  const [newDescription, setNewDescription] = useState<string>("");
+  const [newMood, setNewMood] = useState<string>("");
+  const [newLucidity, setNewLucidity] = useState<boolean>(false);
+  const [newTags, setNewTags] = useState<string>("");
+  const [newLocation, setNewLocation] = useState<string>("");
+  const [newIntensity, setNewIntensity] = useState<number>(5);
+  const [newRecurring, setNewRecurring] = useState<boolean>(false);
+  const [newCharacters, setNewCharacters] = useState<string>("");
+  const [newInterpretation, setNewInterpretation] = useState<string>("");
+  const [newType, setNewType] = useState<string>("rêve");
+  const [newBeforeSleepMood, setNewBeforeSleepMood] = useState<string>("");
+  const [newSleepTime, setNewSleepTime] = useState<string>("");
+  const [newWokeUpTime, setNewWokeUpTime] = useState<string>("");
+  const [newDreamClarity, setNewDreamClarity] = useState<number>(5);
+  const [newDreamScore, setNewDreamScore] = useState<number>(5);
+  const [newAudioNote, setNewAudioNote] = useState<string>("");
+  const [newPrivate, setNewPrivate] = useState<boolean>(false);
+  const [newDate, setNewDate] = useState<string>("");
 
-  // Collapsible sections state
-  const [expandedSections, setExpandedSections] = useState({
+  // Collapsible sections state avec type strict
+  const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     details: false,
     organization: false,
     sleep: false,
@@ -48,7 +51,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
 
   // Fetch dream data on component mount
   useEffect(() => {
-    const fetchDream = async () => {
+    const fetchDream = async (): Promise<void> => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
         const response = await fetch(`${baseUrl}/api/dreams/${id}`, {
@@ -112,14 +115,15 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
     }
   }, [id, router]);
 
-  const toggleSection = (section: string) => {
+  // Fonction toggleSection avec type strict
+  const toggleSection = (section: SectionKey): void => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -396,7 +400,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
           <div className="p-4 bg-slate-800">
             <VoiceRecorder
               existingAudioUrl={newAudioNote}
-              onAudioChange={(url) => setNewAudioNote(url)}
+              onAudioChange={(url: string) => setNewAudioNote(url)}
               dreamId={id}
             />
           </div>

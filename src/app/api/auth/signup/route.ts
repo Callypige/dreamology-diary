@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server'
 import User from '@/models/user'
-import connectToDatabase from '@/libs/mongodb';
+import connectToDatabase from '@/lib/mongodb';
 import Profile from "@/models/profile";
 
 
