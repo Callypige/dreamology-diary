@@ -29,7 +29,6 @@ interface DreamData {
   recurring?: boolean;
 }
 
-// Type pour les clés des sections
 type SectionKey = 'immersion' | 'sleep' | 'extras';
 
 export default function DreamDetails() {
@@ -106,14 +105,7 @@ export default function DreamDetails() {
   const hasExtrasContent = dream.dreamScore || dream.private;
 
   return (
-    // Option 1: Fond sombre uniforme et élégant
-    <section className="bg-slate-900 min-h-screen flex justify-center py-12 px-4">
-      
-      {/* Option 2: Si vous voulez garder un gradient, voici des alternatives plus harmonieuses :
-      <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen flex justify-center py-12 px-4">
-      <section className="bg-gradient-to-b from-gray-900 to-slate-900 min-h-screen flex justify-center py-12 px-4">
-      <section className="bg-gradient-to-br from-slate-950 to-gray-900 min-h-screen flex justify-center py-12 px-4">
-      */}
+    <section className=" min-h-screen flex justify-center py-12 px-4">
 
       <div className="bg-slate-800 rounded-3xl shadow-xl border border-slate-600 p-4 md:p-8 lg:p-12 w-full max-w-3xl">
 

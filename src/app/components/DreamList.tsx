@@ -137,10 +137,6 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
 
   return (
     <section className="w-full px-8 py-12 min-h-screen">
-      <h1 className="text-3xl font-bold text-white text-center tracking-wide mb-8 drop-shadow-lg">
-        ✨ Mes Rêves ✨
-      </h1>
-
       {/* Results summary */}
       {pagination.totalDreams > 0 && (
         <div className="text-center mb-6">
