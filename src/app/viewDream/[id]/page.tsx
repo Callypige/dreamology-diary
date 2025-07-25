@@ -151,9 +151,6 @@ export default function DreamDetails() {
                 <source src={dream.audioNote} type="audio/mpeg" />
                 Votre navigateur ne supporte pas la lecture audio.
               </audio>
-              <p className="text-xs text-gray-400">
-                💡 Si l'audio ne se charge pas, vérifiez que le fichier existe encore sur le serveur.
-              </p>
             </div>
           </div>
         )}
