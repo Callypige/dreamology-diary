@@ -37,7 +37,7 @@ export default function DreamDetails() {
   const [dream, setDream] = useState<DreamData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   // Collapsible sections state avec type strict
   const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     immersion: false,
@@ -106,21 +106,29 @@ export default function DreamDetails() {
   const hasExtrasContent = dream.dreamScore || dream.private;
 
   return (
-    <section className="bg-gradient-to-r from-indigo-950 to-slate-950 min-h-screen flex justify-center py-12 px-4">
-      <div className="bg-slate-800 rounded-3xl shadow-xl border border-indigo-900 p-4 md:p-8 lg:p-12 w-full max-w-3xl">
-        
+    // Option 1: Fond sombre uniforme et élégant
+    <section className="bg-slate-900 min-h-screen flex justify-center py-12 px-4">
+      
+      {/* Option 2: Si vous voulez garder un gradient, voici des alternatives plus harmonieuses :
+      <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen flex justify-center py-12 px-4">
+      <section className="bg-gradient-to-b from-gray-900 to-slate-900 min-h-screen flex justify-center py-12 px-4">
+      <section className="bg-gradient-to-br from-slate-950 to-gray-900 min-h-screen flex justify-center py-12 px-4">
+      */}
+
+      <div className="bg-slate-800 rounded-3xl shadow-xl border border-slate-600 p-4 md:p-8 lg:p-12 w-full max-w-3xl">
+
         {/* Header - Always visible */}
         <div className="mb-6">
           <p className="text-gray-400 mb-4 text-sm">
             📅 <strong>Date :</strong> {formatDate(dream.date)}
           </p>
-          <h1 className="text-xl md:text-3xl font-bold text-white mb-4 border-b-2 border-indigo-500 pb-2">
+          <h1 className="text-xl md:text-3xl font-bold text-white mb-4 border-b-2 border-blue-500 pb-2">
             🌠 {dream.title}
           </h1>
           <div className="text-gray-300 mb-4 leading-relaxed">
             {dream.description}
           </div>
-          
+
           {/* Basic info - Always visible */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm text-gray-300 bg-slate-700 p-4 rounded-lg">
             <p><strong>Type :</strong> {dream.type}</p>
@@ -132,7 +140,7 @@ export default function DreamDetails() {
         {/* Audio Section - Always visible if exists */}
         {dream.audioNote && (
           <div className="mb-6">
-            <h2 className="text-lg text-indigo-400 font-semibold border-b border-indigo-500 mb-3">🎤 Note vocale</h2>
+            <h2 className="text-lg text-blue-400 font-semibold border-b border-blue-500 mb-3">🎤 Note vocale</h2>
             <div className="bg-slate-700 rounded-lg p-4 border border-slate-600">
               <p className="text-gray-300 mb-3 text-sm">
                 Écoutez la note vocale enregistrée pour ce rêve :
@@ -143,15 +151,15 @@ export default function DreamDetails() {
                 <source src={dream.audioNote} type="audio/mpeg" />
                 Votre navigateur ne supporte pas la lecture audio.
               </audio>
-              <p className="text-xs text-gray-400">clear
-                💡 Si lC&#39;audio ne se charge pas, vérifiez que le fichier existe encore sur le serveur.
+              <p className="text-xs text-gray-400">
+                💡 Si l'audio ne se charge pas, vérifiez que le fichier existe encore sur le serveur.
               </p>
             </div>
           </div>
         )}
 
         {/* Collapsible Sections */}
-        
+
         {/* Immersion Section */}
         {hasImmersionContent && (
           <div className="mb-4">
@@ -159,10 +167,10 @@ export default function DreamDetails() {
               onClick={() => toggleSection('immersion')}
               className="w-full flex items-center justify-between p-3 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors"
             >
-              <h2 className="text-lg text-indigo-400 font-semibold">🌙 Détails du rêve</h2>
+              <h2 className="text-lg text-blue-400 font-semibold">🌙 Détails du rêve</h2>
               {expandedSections.immersion ? <TbChevronUp size={20} /> : <TbChevronDown size={20} />}
             </button>
-            
+
             {expandedSections.immersion && (
               <div className="mt-3 p-4 bg-slate-700/50 rounded-lg">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
@@ -178,7 +186,7 @@ export default function DreamDetails() {
                       <p className="mb-2">🔖 <strong>Tags :</strong></p>
                       <div className="flex flex-wrap gap-1">
                         {dream.tags.map((tag, i) => (
-                          <span key={i} className="bg-indigo-700 text-white text-xs px-2 py-1 rounded-full">
+                          <span key={i} className="bg-blue-700 text-white text-xs px-2 py-1 rounded-full">
                             #{tag}
                           </span>
                         ))}
@@ -201,10 +209,10 @@ export default function DreamDetails() {
               onClick={() => toggleSection('sleep')}
               className="w-full flex items-center justify-between p-3 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors"
             >
-              <h2 className="text-lg text-indigo-400 font-semibold">🧘 Sommeil & Bien-être</h2>
+              <h2 className="text-lg text-blue-400 font-semibold">🧘 Sommeil & Bien-être</h2>
               {expandedSections.sleep ? <TbChevronUp size={20} /> : <TbChevronDown size={20} />}
             </button>
-            
+
             {expandedSections.sleep && (
               <div className="mt-3 p-4 bg-slate-700/50 rounded-lg">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
@@ -225,10 +233,10 @@ export default function DreamDetails() {
               onClick={() => toggleSection('extras')}
               className="w-full flex items-center justify-between p-3 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors"
             >
-              <h2 className="text-lg text-indigo-400 font-semibold">⚙️ Autres informations</h2>
+              <h2 className="text-lg text-blue-400 font-semibold">⚙️ Autres informations</h2>
               {expandedSections.extras ? <TbChevronUp size={20} /> : <TbChevronDown size={20} />}
             </button>
-            
+
             {expandedSections.extras && (
               <div className="mt-3 p-4 bg-slate-700/50 rounded-lg">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
@@ -245,7 +253,7 @@ export default function DreamDetails() {
           <div className="text-center">
             <Link 
               href={`/editDream/${dream._id}`} 
-              className="inline-flex items-center bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 transition font-medium"
+              className="inline-flex items-center bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition font-medium"
             >
               ✏️ Modifier ce rêve
             </Link>
@@ -253,7 +261,7 @@ export default function DreamDetails() {
           <div className="text-center">
             <Link 
               href="/" 
-              className="inline-flex items-center text-indigo-400 hover:text-indigo-300 transition"
+              className="inline-flex items-center text-blue-400 hover:text-blue-300 transition"
             >
               <TbArrowBackUp className="mr-2" />
               Retour à la liste des rêves
