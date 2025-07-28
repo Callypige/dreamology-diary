@@ -4,6 +4,13 @@ A dream journal web app to record, revisit, and reflect on dreams — with audio
 
 **🌐 Live Demo:** [dreamology-tools.netlify.app](https://dreamology-tools.netlify.app)
 
+🔑 Demo Account
+For recruiters and testers, use these credentials:
+Email: somni_dreamology-demo@yopmail.com
+Password: Demouser1234
+
+This account contains sample dream entries to showcase all features.
+
 ## ✨ Features
 
 ✍️ **Write and save dream entries** with detailed metadata  
