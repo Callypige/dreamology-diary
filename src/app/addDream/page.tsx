@@ -122,8 +122,7 @@ export default function AddDream() {
         throw new Error("Erreur lors de la création du rêve");
       }
     } catch (err) {
-      console.error("Error creating dream:", err);
-      error("Une erreur est survenue lors de la création du rêve.");
+      showError("Une erreur est survenue lors de la création du rêve : " + (err instanceof Error ? err.message : "Erreur inconnue"));
     } finally {
       setIsSubmitting(false);
     }

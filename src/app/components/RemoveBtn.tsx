@@ -10,7 +10,7 @@ interface RemoveBtnProps {
 }
 
 export default function RemoveBtn({ id, onDeleted } : RemoveBtnProps) {
-    const { toast, success, error: showError, hideToast } = useToast();
+    const { toast, error: showError, hideToast } = useToast();
     const router = useRouter();
     
     const removeDream = async () => {

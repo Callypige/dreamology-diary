@@ -1,4 +1,4 @@
-// src/utils/dateTimeUtils.ts - Tout en un seul fichier
+
 
 // ===== Format =====
 export const formatDate = (date: string): string => {
@@ -10,7 +10,7 @@ export const formatDate = (date: string): string => {
       hour: "2-digit",
       minute: "2-digit",
     });
-  } catch (error) {
+  } catch {
     return "Date invalide";
   }
 };
@@ -22,7 +22,7 @@ export const formatDateOnly = (date: string): string => {
       month: "2-digit",
       year: "numeric",
     });
-  } catch (error) {
+  } catch {
     return "Date invalide";
   }
 };
@@ -33,7 +33,7 @@ export const formatTimeOnly = (date: string): string => {
       hour: "2-digit",
       minute: "2-digit",
     });
-  } catch (error) {
+  } catch {
     return "Heure invalide";
   }
 };
@@ -45,7 +45,7 @@ export const formatDateForInput = (dateString: string): string => {
   try {
     const date = new Date(dateString);
     return date.toISOString().split('T')[0]; // YYYY-MM-DD
-  } catch (error) {
+  } catch {
     return "";
   }
 };
@@ -58,7 +58,7 @@ export const formatTimeForInput = (dateString: string): string => {
     const hours = date.getUTCHours().toString().padStart(2, '0');
     const minutes = date.getUTCMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
-  } catch (error) {
+  } catch {
     return "";
   }
 };
@@ -74,8 +74,8 @@ export const combineDateTime = (dateString: string, timeString: string): string 
     date.setUTCHours(hours, minutes, 0, 0);
     
     return date.toISOString();
-  } catch (error) {
-    console.error("Error combining date and time:", error);
+  } catch { 
+      console.error("Erreur lors de la combinaison de la date et de l'heure:", dateString, timeString);
     return "";
   }
 };
@@ -117,7 +117,7 @@ export const validateSleepTimes = (sleepTime?: string, wokeUpTime?: string, drea
       warnings,
       sleepDuration: Math.round(diffHours * 100) / 100
     };
-  } catch (error) {
+  } catch {
     return {
       isValid: false,
       errors: ["Erreur dans les heures saisies"],
@@ -152,7 +152,7 @@ export const daysSince = (dateString: string): number => {
 export const calculateSleepDuration = (sleepTime: string, wokeUpTime: string): number | null => {
   try {
     const sleep = new Date(`2000-01-01T${sleepTime}:00`);
-    let wake = new Date(`2000-01-01T${wokeUpTime}:00`);
+    const wake = new Date(`2000-01-01T${wokeUpTime}:00`);
     
     if (wake.getTime() < sleep.getTime()) {
       wake.setDate(wake.getDate() + 1);

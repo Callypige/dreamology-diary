@@ -26,7 +26,7 @@ export default function VoiceRecorder({
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { toast, success, error: showError, hideToast } = useToast();
+  const { toast, error: showError, hideToast } = useToast();
 
   // Timer for recording duration
   useEffect(() => {

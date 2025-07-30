@@ -108,7 +108,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
         setLoading(false);
       } catch (err) {
         console.error("Error fetching dream:", err);
-        error("Erreur lors du chargement du rêve");
+        showError("Erreur lors du chargement du rêve : " + (err instanceof Error ? err.message : "Erreur inconnue"));
         router.push("/");
       }
     };
@@ -131,7 +131,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
     
     // Vérifier les erreurs de validation avant soumission
     if (timeValidation.errors.length > 0) {
-      error("Veuillez corriger les erreurs dans les heures de sommeil avant de continuer.");
+      showError("Veuillez corriger les erreurs dans les heures de sommeil avant de continuer.");
       return;
     }
     
@@ -184,7 +184,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
 
     } catch (err) {
       console.error("Error updating dream:", err);
-      error("Une erreur est survenue lors de la mise à jour.");
+      showError("Une erreur est survenue lors de la mise à jour : " + (err instanceof Error ? err.message : "Erreur inconnue"));
     } finally {
       setIsSubmitting(false);
     }
