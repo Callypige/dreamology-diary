@@ -4,16 +4,18 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TbChevronDown, TbChevronUp } from "react-icons/tb";
 import VoiceRecorder from "@/app/components/audio/VoiceRecorder";
+import { formatTimeForInput, combineDateTime, validateSleepTimes } from '@/utils/dateTimeUtils';
+import { Toast, useToast } from "@/app/components/Toast";
 
 interface EditDreamFormProps {
   id: string;
 }
 
-// Type pour les clés des sections
 type SectionKey = 'details' | 'organization' | 'sleep' | 'audio' | 'other';
 
 export default function EditDreamForm({ id }: EditDreamFormProps) {
   const router = useRouter();
+  const { toast, success, error, hideToast } = useToast();
 
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
@@ -30,7 +32,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
   const [newRecurring, setNewRecurring] = useState<boolean>(false);
   const [newCharacters, setNewCharacters] = useState<string>("");
   const [newInterpretation, setNewInterpretation] = useState<string>("");
-  const [newType, setNewType] = useState<string>("rêve");
+  const [newType, setNewType] = useState<string>("normal");
   const [newBeforeSleepMood, setNewBeforeSleepMood] = useState<string>("");
   const [newSleepTime, setNewSleepTime] = useState<string>("");
   const [newWokeUpTime, setNewWokeUpTime] = useState<string>("");
@@ -48,6 +50,9 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
     audio: false,
     other: false
   });
+
+  // Validation des heures de sommeil en temps réel
+  const timeValidation = validateSleepTimes(newSleepTime, newWokeUpTime, newDate);
 
   // Fetch dream data on component mount
   useEffect(() => {
@@ -76,36 +81,35 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
         setNewRecurring(!!dream.recurring);
         setNewCharacters(dream.characters?.join(", ") || "");
         setNewInterpretation(dream.interpretation || "");
-        setNewType(dream.type || "rêve");
+        setNewType(dream.type || "normal");
         setNewBeforeSleepMood(dream.beforeSleepMood || "");
         setNewDreamClarity(dream.dreamClarity || 5);
         setNewDreamScore(dream.dreamScore || 5);
         setNewAudioNote(dream.audioNote || "");
         setNewPrivate(!!dream.private);
 
-        // Handle dates
+        // Handle dates - CORRECTION TIMEZONE
         if (dream.date) {
           const dreamDate = new Date(dream.date);
           const dateStr = dreamDate.toISOString().split('T')[0];
           setNewDate(dateStr);
         }
 
+        // Handle times - CORRECTION TIMEZONE avec les nouvelles fonctions
         if (dream.sleepTime) {
-          const sleepTime = new Date(dream.sleepTime);
-          const sleepTimeStr = `${sleepTime.getHours().toString().padStart(2, '0')}:${sleepTime.getMinutes().toString().padStart(2, '0')}`;
+          const sleepTimeStr = formatTimeForInput(dream.sleepTime);
           setNewSleepTime(sleepTimeStr);
         }
 
         if (dream.wokeUpTime) {
-          const wokeUpTime = new Date(dream.wokeUpTime);
-          const wokeUpTimeStr = `${wokeUpTime.getHours().toString().padStart(2, '0')}:${wokeUpTime.getMinutes().toString().padStart(2, '0')}`;
+          const wokeUpTimeStr = formatTimeForInput(dream.wokeUpTime);
           setNewWokeUpTime(wokeUpTimeStr);
         }
 
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching dream:", error);
-        alert("Erreur lors du chargement du rêve");
+      } catch (err) {
+        console.error("Error fetching dream:", err);
+        error("Erreur lors du chargement du rêve");
         router.push("/");
       }
     };
@@ -125,6 +129,13 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    
+    // Vérifier les erreurs de validation avant soumission
+    if (timeValidation.errors.length > 0) {
+      error("Veuillez corriger les erreurs dans les heures de sommeil avant de continuer.");
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
@@ -147,8 +158,13 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
           interpretation: newInterpretation,
           type: newType,
           beforeSleepMood: newBeforeSleepMood,
-          ...(newSleepTime && { sleepTime: newSleepTime }),
-          ...(newWokeUpTime && { wokeUpTime: newWokeUpTime }),
+          // CORRECTION TIMEZONE - Combinaison correcte date + heure
+          ...(newSleepTime && newDate && { 
+            sleepTime: combineDateTime(newDate, newSleepTime) 
+          }),
+          ...(newWokeUpTime && newDate && { 
+            wokeUpTime: combineDateTime(newDate, newWokeUpTime) 
+          }),
           dreamClarity: newDreamClarity,
           dreamScore: newDreamScore,
           audioNote: newAudioNote,
@@ -161,12 +177,15 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      alert("Rêve mis à jour avec succès ! 🎉");
-      router.push("/");
+      success("Rêve mis à jour avec succès ! 🎉");
+      
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
 
-    } catch (error) {
-      console.error("Error updating dream:", error);
-      alert("Une erreur est survenue lors de la mise à jour.");
+    } catch (err) {
+      console.error("Error updating dream:", err);
+      error("Une erreur est survenue lors de la mise à jour.");
     } finally {
       setIsSubmitting(false);
     }
@@ -225,7 +244,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
               onChange={(e) => setNewType(e.target.value)}
               className={inputClass}
             >
-              <option value="rêve">Rêve</option>
+              <option value="normal">Rêve normal</option>
               <option value="cauchemar">Cauchemar</option>
               <option value="lucide">Lucide</option>
               <option value="autre">Autre</option>
@@ -241,25 +260,55 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
               className={inputClass}
             />
           </div>
-          {/* Sleep Time Section */}
+
+          {/* Sleep Time Section avec validation */}
           <div>
-              <label className={labelClass}>Heure de coucher</label>
-              <input
-                type="time"
-                value={newSleepTime}
-                onChange={(e) => setNewSleepTime(e.target.value)}
-                className={inputClass}
-              />
+            <label className={labelClass}>Heure de coucher</label>
+            <input
+              type="time"
+              value={newSleepTime}
+              onChange={(e) => setNewSleepTime(e.target.value)}
+              className={inputClass}
+            />
           </div>
+
           <div>
-              <label className={labelClass}>Heure de réveil</label>
-              <input
-                type="time"
-                value={newWokeUpTime}
-                onChange={(e) => setNewWokeUpTime(e.target.value)}
-                className={inputClass}
-              />
+            <label className={labelClass}>Heure de réveil</label>
+            <input
+              type="time"
+              value={newWokeUpTime}
+              onChange={(e) => setNewWokeUpTime(e.target.value)}
+              className={inputClass}
+            />
           </div>
+
+          {/* Validation des heures de sommeil */}
+          {timeValidation.warnings.length > 0 && (
+            <div className="col-span-2">
+              <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-3">
+                <p className="text-yellow-400 text-sm font-medium mb-1">⚠️ Attention :</p>
+                {timeValidation.warnings.map((warning, index) => (
+                  <p key={index} className="text-yellow-300 text-sm">{warning}</p>
+                ))}
+                {timeValidation.sleepDuration && (
+                  <p className="text-gray-300 text-xs mt-1">
+                    Durée de sommeil calculée : {timeValidation.sleepDuration}h
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {timeValidation.errors.length > 0 && (
+            <div className="col-span-2">
+              <div className="bg-red-900/30 border border-red-600 rounded-lg p-3">
+                <p className="text-red-400 text-sm font-medium mb-1">❌ Erreur :</p>
+                {timeValidation.errors.map((error, index) => (
+                  <p key={index} className="text-red-300 text-sm">{error}</p>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -447,11 +496,25 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
       {/* Submit Button */}
       <button
         type="submit"
-        disabled={isSubmitting}
-        className="w-full mt-8 p-4 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-xl transition disabled:opacity-50"
+        disabled={isSubmitting || timeValidation.errors.length > 0}
+        className="w-full mt-8 p-4 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isSubmitting ? "Mise à jour en cours..." : "Mettre à jour le rêve ✨"}
       </button>
+      
+      {timeValidation.errors.length > 0 && (
+        <p className="text-red-400 text-sm text-center mt-2">
+          ⚠️ Corrigez les erreurs ci-dessus pour pouvoir sauvegarder
+        </p>
+      )}
+
+      {/* Toast Component */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </form>
   );
 }

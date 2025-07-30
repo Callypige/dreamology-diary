@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { TbArrowBackUp, TbChevronDown, TbChevronUp } from "react-icons/tb";
 import { useParams } from "next/navigation";
+import { formatDate } from "@/utils/dateTimeUtils";
 
-// Interface pour le rêve avec _id MongoDB
 interface DreamData {
   _id: string;
   title: string;
@@ -84,15 +84,6 @@ export default function DreamDetails() {
     return <p className="text-center text-white mt-12">Ce rêve est introuvable...</p>;
   }
 
-  const formatDate = (date: string): string => {
-    return new Date(date).toLocaleString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   // Helper function to check if section has content
   const hasImmersionContent = dream.mood || dream.lucidity || dream.intensity || 

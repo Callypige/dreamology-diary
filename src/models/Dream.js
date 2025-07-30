@@ -18,8 +18,8 @@ const dreamSchema = new Schema(
     interpretation: { type: String }, // Personal meaning or analysis
     type: {
       type: String,
-      enum: ["cauchemar", "lucide", "autre"], // Type of dream
-      default: "rêve",
+      enum: ["normal", "cauchemar", "lucide", "autre"], 
+      default: "normal", // Type of dream
     },
 
     // 🧘 Well-being & sleep tracking fields

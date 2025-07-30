@@ -27,7 +27,6 @@ interface PaginationData {
   limit: number;
 }
 
-// Interface étendue pour les rêves avec _id MongoDB
 interface DreamWithMongoId extends Omit<Dream, 'id'> {
   _id: string;
   id?: string; // Optionnel pour compatibilité

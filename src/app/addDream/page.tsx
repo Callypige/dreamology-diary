@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TbArrowBackUp, TbChevronDown, TbChevronUp } from "react-icons/tb";
 import VoiceRecorder from "../components/audio/VoiceRecorder";
+import { Toast, useToast } from "../components/Toast";
 
 interface DreamFormData {
   title: string;
   description: string;
-  type: "rêve" | "cauchemar" | "lucide" | "autre";
+  type: "normal" | "cauchemar" | "lucide" | "autre";
   date: string;
   intensity: string;
   mood: string;
@@ -35,6 +36,9 @@ type SectionKey = 'details' | 'organization' | 'sleep' | 'audio' | 'other';
 import { ChangeEvent, FormEvent } from "react";
 
 export default function AddDream() {
+  // ✅ Hook toast ajouté
+  const { toast, success, error, hideToast } = useToast();
+
   // Helper function to get today's date in YYYY-MM-DD format
   const getTodayDate = (): string => {
     const today = new Date();
@@ -47,7 +51,7 @@ export default function AddDream() {
   const [formData, setFormData] = useState<DreamFormData>({
     title: "",
     description: "",
-    type: "rêve",
+    type: "normal",
     date: getTodayDate(),
     intensity: "",
     mood: "",
@@ -101,7 +105,7 @@ export default function AddDream() {
     setIsSubmitting(true);
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3007";
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
       const res = await fetch(`${baseUrl}/api/dreams`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,14 +114,20 @@ export default function AddDream() {
       });
       
       if (res.ok) {
-        alert("Rêve créé avec succès ! 🎉");
-        router.push("/");
+        // ✅ Toast au lieu d'alert
+        success("Rêve créé avec succès ! 🎉");
+        
+        // Délai pour voir le toast avant redirection
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
       } else {
         throw new Error("Erreur lors de la création du rêve");
       }
-    } catch (error) {
-      console.error("Error creating dream:", error);
-      alert("Une erreur est survenue lors de la création du rêve.");
+    } catch (err) {
+      console.error("Error creating dream:", err);
+      // ✅ Toast d'erreur au lieu d'alert
+      error("Une erreur est survenue lors de la création du rêve.");
     } finally {
       setIsSubmitting(false);
     }
@@ -170,7 +180,7 @@ export default function AddDream() {
             <div>
               <label className={labelClass}>Type de rêve</label>
               <select name="type" value={formData.type} onChange={handleChange} className={inputClass}>
-                <option value="rêve">Rêve</option>
+                <option value="normal">Rêve normal</option> 
                 <option value="cauchemar">Cauchemar</option>
                 <option value="lucide">Lucide</option>
                 <option value="autre">Autre</option>
@@ -447,6 +457,14 @@ export default function AddDream() {
           <TbArrowBackUp size={24} className="mr-2" /> Retour à la liste
         </Link>
       </div>
+
+      {/* ✅ Toast Component ajouté */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </section>
   );
 }

@@ -90,7 +90,7 @@ export default function DreamFilterUI() {
                 onChange={(e) => setType(e.target.value)}
                 className="bg-slate-700 text-white rounded px-3 py-2 focus:outline-none border border-slate-600 focus:ring-2 focus:ring-indigo-500"
               >
-                <option value="">Tous</option>
+                <option value="normal">Rêve normal</option> 
                 <option value="lucide">Lucide</option>
                 <option value="cauchemar">Cauchemar</option>
                 <option value="autre">Autre</option>
