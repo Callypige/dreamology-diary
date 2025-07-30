@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
+import { Toast, useToast } from "../Toast";
 
 interface VoiceRecorderProps {
   onAudioChange: (audioUrl: string) => void; 
@@ -24,6 +25,8 @@ export default function VoiceRecorder({
   const audioChunksRef = useRef<Blob[]>([]);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { toast, success, error: showError, hideToast } = useToast();
 
   // Timer for recording duration
   useEffect(() => {
@@ -111,7 +114,7 @@ export default function VoiceRecorder({
           setAudioUrl(serverAudioUrl);
           onAudioChange(serverAudioUrl);
         } catch (error) {
-          alert('Erreur lors de la sauvegarde audio');
+          showError('Erreur lors de la sauvegarde audio');
           console.error(error);
         }
         
@@ -122,7 +125,7 @@ export default function VoiceRecorder({
       mediaRecorder.start();
     } catch (error) {
       console.error('Microphone error:', error);
-      alert('Impossible d\'accéder au microphone');
+      showError('Impossible d\'accéder au microphone');
       setIsRecording(false);
     }
   };
@@ -272,6 +275,12 @@ export default function VoiceRecorder({
           </p>
         </div>
       )}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </section>
   );
 }

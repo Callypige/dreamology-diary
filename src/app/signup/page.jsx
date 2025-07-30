@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";  
+import { Toast, useToast } from "../components/Toast";
 
 const SignUp = () => {
   const [form, setForm] = useState({
@@ -17,6 +18,7 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const { toast, success, error: showError, hideToast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +46,7 @@ const SignUp = () => {
     setLoading(false);
 
     if (res.ok) {
-      alert("✅ Compte créé avec succès ! Redirection...");
+      success("✅ Compte créé avec succès ! Redirection...");
       router.push("/sign-in");
     } else {
       setError(data.message);
@@ -140,6 +142,12 @@ const SignUp = () => {
           </Link>
         </p>
       </div>
+      <Toast
+          message={toast.message}
+          type={toast.type}
+          isVisible={toast.isVisible}
+          onClose={hideToast}
+        />
     </div>
   );
 };

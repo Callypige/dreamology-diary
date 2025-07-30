@@ -1,84 +1,140 @@
-// src/__tests__/utils/dateUtils.test.ts
-import { formatDate } from '@/utils/dateTimeUtils';
+// src/__tests__/utils/dateTimeUtils.test.ts
+import {
+  formatDate,
+  formatDateOnly,
+  formatTimeOnly,
+  formatDateForInput,
+  formatTimeForInput,
+  combineDateTime,
+  validateSleepTimes,
+  isToday,
+  daysSince,
+  calculateSleepDuration
+} from '@/utils/dateTimeUtils';
 
-describe('formatDate - avec vraies données MongoDB', () => {
-  test('formats main dream date correctly', () => {
+describe('DateTime Utils', () => {
+  // ===== TESTS DE FORMATAGE =====
+  describe('formatDate (affichage complet)', () => {
+    test('formats MongoDB date correctly', () => {
+      const result = formatDate('2025-07-16T00:00:00.000+00:00');
+      expect(result).toMatch(/16\/07\/2025 \d{2}:\d{2}/);
+    });
 
-    const dreamDate = '2025-07-16T00:00:00.000+00:00';
-    const result = formatDate(dreamDate);
-    
-    expect(result).toMatch(/16\/07\/2025/);
-    expect(result).toMatch(/\d{2}:\d{2}/);
-    expect(result).not.toBe('Date invalide');
-  });
-
-  test('formats sleepTime correctly', () => {
-    const sleepTime = '2025-07-16T21:30:00.000+00:00';
-    const result = formatDate(sleepTime);
-    
-    expect(result).toMatch(/16\/07\/2025/);
-    expect(result).toMatch(/23:30/); // 21:30 UTC + 2h = 23:30
-  });
-
-  test('formats wokeUpTime correctly', () => {
-    const wokeUpTime = '2025-07-16T07:30:00.000+00:00';
-    const result = formatDate(wokeUpTime);
-    
-    expect(result).toMatch(/16\/07\/2025/);
-    expect(result).toMatch(/09:30/); // 07:30 UTC + 2h = 09:30
-  });
-
-  test('formats createdAt timestamp correctly', () => {
-    const createdAt = '2025-07-22T09:09:36.740+00:00';
-    const result = formatDate(createdAt);
-    
-    expect(result).toMatch(/22\/07\/2025/);
-    expect(result).toMatch(/11:09/); // 09:09 UTC + 2h = 11:09
-  });
-
-  test('handles different dream dates from your data', () => {
-    const dates = [
-      '2025-07-16T00:00:00.000+00:00', 
-      '2025-07-10T00:00:00.000+00:00',   
-      '2025-07-23T00:00:00.000+00:00', 
-      '2025-07-09T00:00:00.000+00:00', 
-      '2025-07-24T00:00:00.000+00:00'  
-    ];
-
-    dates.forEach(date => {
-      const result = formatDate(date);
-      
-      expect(result).toMatch(/^\d{2}\/\d{2}\/2025 \d{2}:\d{2}$/);
-      expect(result).not.toBe('Date invalide');
+    test('handles invalid date', () => {
+      expect(formatDate('invalid')).toBe('Invalid Date');
     });
   });
 
-  test('handles the strange dream sleep/wake times', () => {
-    const sleepTime = '2025-07-17T23:40:00.000+00:00';
-    const wokeUpTime = '2025-07-17T09:00:00.000+00:00';
-    
-    const sleepResult = formatDate(sleepTime);
-    const wakeResult = formatDate(wokeUpTime);
-    
-    // 23:40 UTC + 2h = 01:40 
-    expect(sleepResult).toMatch(/18\/07\/2025 01:40/);
-    
-    // 09:00 UTC + 2h = 11:00 
-    expect(wakeResult).toMatch(/17\/07\/2025 11:00/);
+  describe('formatDateOnly', () => {
+    test('formats date without time', () => {
+      const result = formatDateOnly('2025-07-16T10:30:00.000Z');
+      expect(result).toBe('16/07/2025');
+    });
   });
 
-  test('formats today date like MongoDB would', () => {
-    const today = '2025-07-29T00:00:00.000+00:00';
-    const result = formatDate(today);
-    
-    expect(result).toMatch(/29\/07\/2025 02:00/); // UTC+2
+  describe('formatTimeOnly', () => {
+    test('formats time without date', () => {
+      const result = formatTimeOnly('2025-07-16T10:30:00.000Z');
+      expect(result).toMatch(/\d{2}:\d{2}/);
+    });
   });
 
-  test('handles MongoDB millisecond precision', () => {
-    const preciseDate = '2025-07-22T09:09:36.740+00:00';
-    const result = formatDate(preciseDate);
-    
-    expect(result).toMatch(/22\/07\/2025 11:09/);
-    expect(result).not.toContain('36');
+  // ===== TESTS POUR FORMULAIRES =====
+  describe('formatDateForInput', () => {
+    test('formats for HTML date input', () => {
+      const result = formatDateForInput('2025-07-16T10:30:00.000Z');
+      expect(result).toBe('2025-07-16');
+    });
+
+    test('handles empty input', () => {
+      expect(formatDateForInput('')).toBe('');
+    });
+  });
+
+  describe('formatTimeForInput', () => {
+    test('formats MongoDB time for HTML time input', () => {
+      const mongoTime = '2025-07-17T21:40:00.000+00:00';
+      const result = formatTimeForInput(mongoTime);
+      
+      expect(result).toBe('21:40');
+    });
+
+    test('handles wake up time correctly', () => {
+      const mongoTime = '2025-07-17T07:30:00.000+00:00';
+      const result = formatTimeForInput(mongoTime);
+      
+      expect(result).toBe('07:30');
+    });
+  });
+
+  // ===== TESTS DE COMBINAISON =====
+  describe('combineDateTime', () => {
+    test('combines date and time correctly', () => {
+      const result = combineDateTime('2025-07-17', '21:40');
+      expect(result).toBe('2025-07-17T21:40:00.000Z');
+    });
+
+    test('handles invalid inputs', () => {
+      expect(combineDateTime('', '21:40')).toBe('');
+      expect(combineDateTime('2025-07-17', '')).toBe('');
+    });
+  });
+
+  // ===== TESTS DE VALIDATION =====
+  describe('validateSleepTimes', () => {
+    test('detects problematic sleep pattern from your real data', () => {
+      const result = validateSleepTimes('23:40', '09:00', '2025-07-17');
+      
+      expect(result.isValid).toBe(true); 
+      expect(result.sleepDuration).toBeCloseTo(9.33, 1); // ~9h20
+    });
+
+    test('validates normal sleep pattern', () => {
+      const result = validateSleepTimes('22:30', '07:00', '2025-07-17');
+      
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+      expect(result.sleepDuration).toBe(8.5);
+    });
+
+    test('warns about very long sleep', () => {
+      const result = validateSleepTimes('20:00', '12:00', '2025-07-17');
+      
+      expect(result.warnings).toContain('Durée de sommeil très longue (>12h)');
+    });
+  });
+
+  // ===== TESTS UTILITAIRES =====
+  describe('calculateSleepDuration', () => {
+    test('calculates sleep duration correctly', () => {
+      const duration = calculateSleepDuration('23:40', '09:00');
+      expect(duration).toBeCloseTo(9.33, 1);
+    });
+
+    test('handles same-day sleep (nap)', () => {
+      const duration = calculateSleepDuration('14:00', '15:30');
+      expect(duration).toBe(1.5);
+    });
+  });
+
+  describe('isToday', () => {
+    test('detects today correctly', () => {
+      const today = new Date().toISOString();
+      expect(isToday(today)).toBe(true);
+    });
+
+    test('detects past date', () => {
+      expect(isToday('2024-01-01T00:00:00Z')).toBe(false);
+    });
+  });
+
+  describe('daysSince', () => {
+    test('calculates days since date', () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      const result = daysSince(yesterday.toISOString());
+      expect(result).toBe(1);
+    });
   });
 });

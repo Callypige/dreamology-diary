@@ -36,8 +36,7 @@ type SectionKey = 'details' | 'organization' | 'sleep' | 'audio' | 'other';
 import { ChangeEvent, FormEvent } from "react";
 
 export default function AddDream() {
-  // ✅ Hook toast ajouté
-  const { toast, success, error, hideToast } = useToast();
+  const { toast, success, error: showError, hideToast } = useToast();
 
   // Helper function to get today's date in YYYY-MM-DD format
   const getTodayDate = (): string => {
@@ -114,10 +113,8 @@ export default function AddDream() {
       });
       
       if (res.ok) {
-        // ✅ Toast au lieu d'alert
         success("Rêve créé avec succès ! 🎉");
         
-        // Délai pour voir le toast avant redirection
         setTimeout(() => {
           router.push("/");
         }, 1500);
@@ -126,7 +123,6 @@ export default function AddDream() {
       }
     } catch (err) {
       console.error("Error creating dream:", err);
-      // ✅ Toast d'erreur au lieu d'alert
       error("Une erreur est survenue lors de la création du rêve.");
     } finally {
       setIsSubmitting(false);
@@ -458,7 +454,6 @@ export default function AddDream() {
         </Link>
       </div>
 
-      {/* ✅ Toast Component ajouté */}
       <Toast
         message={toast.message}
         type={toast.type}

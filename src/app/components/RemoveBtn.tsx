@@ -1,6 +1,8 @@
 'use client';
 import { useRouter } from "next/navigation";
 import { HiOutlineTrash } from "react-icons/hi";
+import { Toast, useToast } from "./Toast";
+
 
 interface RemoveBtnProps {
   id: string;
@@ -8,6 +10,7 @@ interface RemoveBtnProps {
 }
 
 export default function RemoveBtn({ id, onDeleted } : RemoveBtnProps) {
+    const { toast, success, error: showError, hideToast } = useToast();
     const router = useRouter();
     
     const removeDream = async () => {
@@ -22,7 +25,6 @@ export default function RemoveBtn({ id, onDeleted } : RemoveBtnProps) {
                 });
 
                 if (request.ok) {
-                    // Appeler le callback si fourni, sinon refresh
                     if (onDeleted) {
                         onDeleted();
                     } else {
@@ -33,18 +35,26 @@ export default function RemoveBtn({ id, onDeleted } : RemoveBtnProps) {
                 }
             } catch (error) {
                 console.error("Erreur lors de la suppression:", error);
-                alert("Erreur lors de la suppression du rêve");
+                showError("Erreur lors de la suppression du rêve");
             }
         }
     }
 
     return (
-        <button 
-            onClick={removeDream} 
-            className="text-red-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-400/10"
-            title="Supprimer ce rêve"
-        >
-            <HiOutlineTrash size={24} />
-        </button>
+        <div>
+            <button 
+                onClick={removeDream} 
+                className="text-red-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-400/10"
+                title="Supprimer ce rêve"
+                >
+                <HiOutlineTrash size={24} />
+            </button>
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                isVisible={toast.isVisible}
+                onClose={hideToast}
+            />
+        </div>
     )
 }

@@ -15,7 +15,7 @@ type SectionKey = 'details' | 'organization' | 'sleep' | 'audio' | 'other';
 
 export default function EditDreamForm({ id }: EditDreamFormProps) {
   const router = useRouter();
-  const { toast, success, error, hideToast } = useToast();
+  const { toast, success, error: showError, hideToast } = useToast();
 
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
@@ -95,7 +95,6 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
           setNewDate(dateStr);
         }
 
-        // Handle times - CORRECTION TIMEZONE avec les nouvelles fonctions
         if (dream.sleepTime) {
           const sleepTimeStr = formatTimeForInput(dream.sleepTime);
           setNewSleepTime(sleepTimeStr);
