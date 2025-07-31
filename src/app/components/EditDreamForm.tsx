@@ -28,7 +28,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
   const [newLucidity, setNewLucidity] = useState<boolean>(false);
   const [newTags, setNewTags] = useState<string>("");
   const [newLocation, setNewLocation] = useState<string>("");
-  const [newIntensity, setNewIntensity] = useState<number>(5);
+  const [newIntensity, setNewIntensity] = useState<number | null>(null);
   const [newRecurring, setNewRecurring] = useState<boolean>(false);
   const [newCharacters, setNewCharacters] = useState<string>("");
   const [newInterpretation, setNewInterpretation] = useState<string>("");
@@ -36,8 +36,8 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
   const [newBeforeSleepMood, setNewBeforeSleepMood] = useState<string>("");
   const [newSleepTime, setNewSleepTime] = useState<string>("");
   const [newWokeUpTime, setNewWokeUpTime] = useState<string>("");
-  const [newDreamClarity, setNewDreamClarity] = useState<number>(5);
-  const [newDreamScore, setNewDreamScore] = useState<number>(5);
+  const [newDreamClarity, setNewDreamClarity] = useState<number | null>(null);
+  const [newDreamScore, setNewDreamScore] = useState<number | null>(null);
   const [newAudioNote, setNewAudioNote] = useState<string>("");
   const [newPrivate, setNewPrivate] = useState<boolean>(false);
   const [newDate, setNewDate] = useState<string>("");
@@ -51,7 +51,6 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
     other: false
   });
 
-  // Validation des heures de sommeil en temps réel
   const timeValidation = validateSleepTimes(newSleepTime, newWokeUpTime, newDate);
 
   // Fetch dream data on component mount
@@ -77,18 +76,17 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
         setNewLucidity(!!dream.lucidity);
         setNewTags(dream.tags?.join(", ") || "");
         setNewLocation(dream.location || "");
-        setNewIntensity(dream.intensity || 5);
+        setNewIntensity(dream.intensity || null);
         setNewRecurring(!!dream.recurring);
         setNewCharacters(dream.characters?.join(", ") || "");
         setNewInterpretation(dream.interpretation || "");
         setNewType(dream.type || "normal");
         setNewBeforeSleepMood(dream.beforeSleepMood || "");
-        setNewDreamClarity(dream.dreamClarity || 5);
-        setNewDreamScore(dream.dreamScore || 5);
+        setNewDreamClarity(dream.dreamClarity || null);
+        setNewDreamScore(dream.dreamScore || null);
         setNewAudioNote(dream.audioNote || "");
         setNewPrivate(!!dream.private);
 
-        // Handle dates - CORRECTION TIMEZONE
         if (dream.date) {
           const dreamDate = new Date(dream.date);
           const dateStr = dreamDate.toISOString().split('T')[0];
@@ -118,7 +116,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
     }
   }, [id, router]);
 
-  // Fonction toggleSection avec type strict
+  // Fonction toggleSection 
   const toggleSection = (section: SectionKey): void => {
     setExpandedSections(prev => ({
       ...prev,
@@ -129,7 +127,6 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     
-    // Vérifier les erreurs de validation avant soumission
     if (timeValidation.errors.length > 0) {
       showError("Veuillez corriger les erreurs dans les heures de sommeil avant de continuer.");
       return;
@@ -151,13 +148,11 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
           lucidity: newLucidity,
           tags: newTags.split(",").map((t: string) => t.trim()).filter(t => t),
           location: newLocation,
-          intensity: newIntensity,
           recurring: newRecurring,
           characters: newCharacters.split(",").map((c: string) => c.trim()).filter(c => c),
           interpretation: newInterpretation,
           type: newType,
           beforeSleepMood: newBeforeSleepMood,
-          // CORRECTION TIMEZONE - Combinaison correcte date + heure
           ...(newSleepTime && newDate && { 
             sleepTime: combineDateTime(newDate, newSleepTime) 
           }),
@@ -166,6 +161,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
           }),
           dreamClarity: newDreamClarity,
           dreamScore: newDreamScore,
+          intensity: newIntensity,
           audioNote: newAudioNote,
           private: newPrivate,
           ...(newDate && { date: newDate }),
@@ -340,8 +336,8 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
                   type="number"
                   min="1"
                   max="10"
-                  value={newIntensity}
-                  onChange={(e) => setNewIntensity(Number(e.target.value))}
+                  value={newIntensity || ""}
+                  onChange={(e) => setNewIntensity(e.target.value ? Number(e.target.value) : null)}
                   className={inputClass}
                 />
               </div>
@@ -360,8 +356,8 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
                   type="number"
                   min="1"
                   max="10"
-                  value={newDreamClarity}
-                  onChange={(e) => setNewDreamClarity(Number(e.target.value))}
+                  value={newDreamClarity || ""}
+                  onChange={(e) => setNewDreamClarity(e.target.value ? Number(e.target.value) : null)}
                   className={inputClass}
                 />
               </div>
@@ -469,12 +465,12 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
         {expandedSections.other && (
           <div className="p-4 bg-slate-800 space-y-4">
             <div>
-              <label className={labelClass}>Note personnelle : {newDreamScore}/10</label>
+              <label className={labelClass}>Note personnelle : {newDreamScore || 'Non définie'}/10</label>
               <input
                 type="range"
                 min="1"
                 max="10"
-                value={newDreamScore}
+                value={newDreamScore || 5}
                 onChange={(e) => setNewDreamScore(Number(e.target.value))}
                 className="w-full accent-pink-500"
               />
