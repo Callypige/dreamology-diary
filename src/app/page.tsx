@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import Image from "next/image";
 import DreamFilterUI from "./components/DreamFilterUI";
+import { Moon } from "lucide-react"
 
 import { Session } from "next-auth";
 
@@ -23,13 +23,9 @@ export default async function Home() {
       ) : (
         <>
             <figure className="flex justify-center">
-              <Image
-                src="/images/cat_sleeping_mainpage.jpg"
-                alt="Chat endormi sur un oreiller"
-                width={300}
-                height={200}
-                className="mb-6 rounded-2xl shadow-mdd"
-                priority
+              <Moon 
+                size={120} 
+                className="mb-6 text-blue-400 mx-auto" 
               />
               <figcaption className="sr-only">
                 Illustration by <a href="https://www.freepik.com" target="_blank" rel="noopener noreferrer">Freepik</a>
@@ -46,16 +42,17 @@ export default async function Home() {
 
             <div className="flex gap-4 justify-center">
               <Link
-                href="sign-in"
-                className="px-6 py-3 bg-pink-700 rounded-md hover:bg-pink-400 transition"
-              >
-                Se connecter
-              </Link>
-              <Link
-                href="auth/signup"
-                className="px-6 py-3 bg-orange-600 rounded-md hover:bg-orange-400 transition"
-              >
-                S’inscrire
+                  href="/auth/sign-in"
+                  className="px-3 py-3 bg-pink-700 text-white text-sm rounded hover:bg-pink-400 transition"
+                >
+                  Se connecter
+                </Link>
+
+                <Link
+                  href="/auth/signup"
+                  className="px-6 py-3 bg-orange-600 rounded-md hover:bg-orange-400 transition"
+                >
+                  S'inscrire
               </Link>
             </div>
           </>

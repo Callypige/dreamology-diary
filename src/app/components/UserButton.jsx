@@ -31,13 +31,13 @@ const UserButton = () => {
       ) : (
         <>
           <Link
-            href="sign-in"
+            href="/auth/sign-in"
             className="px-3 py-1 bg-pink-700 text-white text-sm rounded hover:bg-pink-400 transition"
           >
             Se connecter
           </Link>
           <Link
-            href="auth/signup"
+            href="/auth/signup"
             className="px-3 py-1 bg-orange-600 text-white text-sm rounded hover:bg-orange-400 transition"
           >
             S'inscrire

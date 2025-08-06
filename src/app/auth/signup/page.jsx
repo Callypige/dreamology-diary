@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
-import Link from "next/link";
-import Image from "next/image";  
+import Link from "next/link"; 
 import { Toast, useToast } from "../../components/Toast";
+import { Moon } from "lucide-react";
 
 const SignUp = () => {
   const [form, setForm] = useState({
@@ -221,14 +221,7 @@ const SignUp = () => {
       <div className="flex min-h-screen items-center justify-center px-4">
         <div className="w-full max-w-md p-6 bg-slate-800 rounded-xl shadow-lg border border-slate-700 text-center">
           <figure className="flex justify-center mb-4">
-            <Image
-              src="/images/cat_play_sign.png"    
-              alt="Chat qui remplit un formulaire"
-              width={140}
-              height={140}
-              className="rounded-full object-cover shadow-md"
-              priority
-            />
+            <Moon size={120} className="mb-6 text-blue-400 mx-auto" />
           </figure>
 
           <div className="text-6xl mb-4">📧</div>
@@ -279,14 +272,7 @@ const SignUp = () => {
       <div className="w-full max-w-md p-6 bg-slate-800 rounded-xl shadow-lg border border-slate-700">
 
         <figure className="flex justify-center mb-4">
-          <Image
-            src="/images/cat_play_sign.png"    
-            alt="Chat qui remplit un formulaire"
-            width={140}
-            height={140}
-            className="rounded-full object-cover shadow-md"
-            priority
-          />
+          <Moon size={120} className="mb-6 text-blue-400 mx-auto" />
           <figcaption className="sr-only">
             Illustration by&nbsp;
             <a
@@ -471,7 +457,7 @@ const SignUp = () => {
 
         <p className="text-center text-sm text-gray-400 mt-4">
           Déjà un compte ?{" "}
-          <Link href="sign-in" className="text-indigo-400 hover:underline">
+          <Link href="/auth/sign-in" className="text-indigo-400 hover:underline">
             Se connecter
           </Link>
         </p>

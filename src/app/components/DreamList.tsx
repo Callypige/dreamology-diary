@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { HiPencilAlt } from "react-icons/hi";
 import RemoveBtn from "./RemoveBtn";
-import Image from "next/image";
 import { Dream } from "../../types/Dream";
 import Pagination from "./pagination/pagination";
 
@@ -120,14 +119,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
     return (
       <>
         <figure className="flex justify-center mb-8">
-          <Image
-            src="/images/doggy.jpg"
-            alt="Chien qui dort paisiblement"
-            width={220}
-            height={220}
-            className="rounded-full object-cover shadow-lg"
-            priority
-          />
+
         </figure>
         <p className="text-center text-white mt-12">Chargement des rêves…</p>
       </>
