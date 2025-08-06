@@ -46,13 +46,13 @@ export default async function Home() {
 
             <div className="flex gap-4 justify-center">
               <Link
-                href="/sign-in"
+                href="sign-in"
                 className="px-6 py-3 bg-pink-700 rounded-md hover:bg-pink-400 transition"
               >
                 Se connecter
               </Link>
               <Link
-                href="/signup"
+                href="auth/signup"
                 className="px-6 py-3 bg-orange-600 rounded-md hover:bg-orange-400 transition"
               >
                 S’inscrire
