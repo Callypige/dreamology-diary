@@ -6,14 +6,63 @@ import Profile from "@/models/Profile";
 import { sendVerificationEmail } from '@/lib/emailService';
 import crypto from 'crypto';
 
-const isValidEmail = (email: string) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+// Interfaces for typing MongoDB and Mongoose errors
+interface MongoServerError extends Error {
+    name: 'MongoServerError';
+    code: number;
+    keyPattern: Record<string, number>;
+    keyValue: Record<string, string>;
+}
+
+interface ValidationError extends Error {
+    name: 'ValidationError';
+    errors: Record<string, {
+        message: string;
+        kind: string;
+        path: string;
+        value: unknown;
+    }>;
+}
+
+// Interface for request body data
+interface SignupRequestBody {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+}
+
+// Type guard to check if it's a MongoDB error
+const isMongoServerError = (error: unknown): error is MongoServerError => {
+    return (
+        typeof error === 'object' && 
+        error !== null && 
+        'name' in error && 
+        'code' in error &&
+        'keyValue' in error &&
+        typeof (error as MongoServerError).code === 'number' &&
+        (error as MongoServerError).name === 'MongoServerError'
+    );
+};
+
+// Type guard to check if it's a Mongoose validation error
+const isValidationError = (error: unknown): error is ValidationError => {
+    return (
+        typeof error === 'object' && 
+        error !== null && 
+        'name' in error && 
+        'errors' in error &&
+        (error as ValidationError).name === 'ValidationError'
+    );
+};
+
+const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
 
 export async function POST(request: Request) {
-    const { name, email, password, confirmPassword } = await request.json();
-
+    const { name, email, password, confirmPassword }: SignupRequestBody = await request.json();
 
     if (!name || !email || !password || !confirmPassword) {
         return NextResponse.json({message: "Tous les champs sont requis"}, {status:400})
@@ -82,34 +131,35 @@ export async function POST(request: Request) {
 
     } catch (error) {
         console.error('Signup error:', error);
-        // Handle duplicate key errors
-        if (typeof error === 'object' && error !== null) {
-            if ((error as any).name === 'MongoServerError' && (error as any).code === 11000) {
-                const field = Object.keys((error as any).keyValue)[0];
-                const value = (error as any).keyValue[field];
+        
+        // Handle MongoDB duplicate key errors
+        if (isMongoServerError(error) && error.code === 11000) {
+            const field = Object.keys(error.keyValue)[0];
+            const value = error.keyValue[field];
 
-                if (field === 'email') {
-                    return NextResponse.json({
-                        message: `Un compte avec l'email "${value}" existe déjà.`,
-                        error: "DUPLICATE_EMAIL"
-                    }, { status: 400 });
-                }
-
+            if (field === 'email') {
                 return NextResponse.json({
-                    message: `Valeur dupliquée détectée pour le champ "${field}".`,
-                    error: "DUPLICATE_KEY"
+                    message: `Un compte avec l'email "${value}" existe déjà.`,
+                    error: "DUPLICATE_EMAIL"
                 }, { status: 400 });
             }
-            // ValidationError handling
-            if ((error as any).name === 'ValidationError') {
-                const validationErrors = Object.values((error as any).errors).map((err: any) => err.message);
-                return NextResponse.json({
-                    message: "Erreur de validation",
-                    errors: validationErrors
-                }, { status: 400 });
-            }
+
+            return NextResponse.json({
+                message: `Valeur dupliquée détectée pour le champ "${field}".`,
+                error: "DUPLICATE_KEY"
+            }, { status: 400 });
+        }
+        
+        // Handle Mongoose validation errors
+        if (isValidationError(error)) {
+            const validationErrors = Object.values(error.errors).map(err => err.message);
+            return NextResponse.json({
+                message: "Erreur de validation",
+                errors: validationErrors
+            }, { status: 400 });
         }
 
+        // Generic error handling
         return NextResponse.json({
             message: "Erreur lors de la création du compte",
             error: process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : "INTERNAL_ERROR"

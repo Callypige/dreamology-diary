@@ -52,7 +52,7 @@ export default async function Home() {
                   href="/auth/signup"
                   className="px-6 py-3 bg-orange-600 rounded-md hover:bg-orange-400 transition"
                 >
-                  S'inscrire
+                  S&#39;inscrire
               </Link>
             </div>
           </>

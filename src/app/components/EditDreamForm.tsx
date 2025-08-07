@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { TbChevronDown, TbChevronUp } from "react-icons/tb";
 import VoiceRecorder from "@/app/components/audio/VoiceRecorder";
@@ -42,7 +42,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
   const [newPrivate, setNewPrivate] = useState<boolean>(false);
   const [newDate, setNewDate] = useState<string>("");
 
-  // Collapsible sections state avec type strict
+  // Collapsible sections state with strict typing
   const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
     details: false,
     organization: false,
@@ -53,70 +53,71 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
 
   const timeValidation = validateSleepTimes(newSleepTime, newWokeUpTime, newDate);
 
+  // Memoize fetchDream function to prevent infinite re-renders
+  const fetchDream = useCallback(async (): Promise<void> => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+      const response = await fetch(`${baseUrl}/api/dreams/${id}`, {
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error('Dream not found');
+      }
+
+      const data = await response.json();
+      const dream = data.dream;
+
+      // Populate form fields
+      setNewTitle(dream.title || "");
+      setNewDescription(dream.description || "");
+      setNewMood(dream.mood || "");
+      setNewLucidity(!!dream.lucidity);
+      setNewTags(dream.tags?.join(", ") || "");
+      setNewLocation(dream.location || "");
+      setNewIntensity(dream.intensity || null);
+      setNewRecurring(!!dream.recurring);
+      setNewCharacters(dream.characters?.join(", ") || "");
+      setNewInterpretation(dream.interpretation || "");
+      setNewType(dream.type || "normal");
+      setNewBeforeSleepMood(dream.beforeSleepMood || "");
+      setNewDreamClarity(dream.dreamClarity || null);
+      setNewDreamScore(dream.dreamScore || null);
+      setNewAudioNote(dream.audioNote || "");
+      setNewPrivate(!!dream.private);
+
+      if (dream.date) {
+        const dreamDate = new Date(dream.date);
+        const dateStr = dreamDate.toISOString().split('T')[0];
+        setNewDate(dateStr);
+      }
+
+      if (dream.sleepTime) {
+        const sleepTimeStr = formatTimeForInput(dream.sleepTime);
+        setNewSleepTime(sleepTimeStr);
+      }
+
+      if (dream.wokeUpTime) {
+        const wokeUpTimeStr = formatTimeForInput(dream.wokeUpTime);
+        setNewWokeUpTime(wokeUpTimeStr);
+      }
+
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching dream:", err);
+      showError("Erreur lors du chargement du rêve : " + (err instanceof Error ? err.message : "Erreur inconnue"));
+      router.push("/");
+    }
+  }, [id, router, showError]);
+
   // Fetch dream data on component mount
   useEffect(() => {
-    const fetchDream = async (): Promise<void> => {
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-        const response = await fetch(`${baseUrl}/api/dreams/${id}`, {
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          throw new Error('Dream not found');
-        }
-
-        const data = await response.json();
-        const dream = data.dream;
-
-        // Populate form fields
-        setNewTitle(dream.title || "");
-        setNewDescription(dream.description || "");
-        setNewMood(dream.mood || "");
-        setNewLucidity(!!dream.lucidity);
-        setNewTags(dream.tags?.join(", ") || "");
-        setNewLocation(dream.location || "");
-        setNewIntensity(dream.intensity || null);
-        setNewRecurring(!!dream.recurring);
-        setNewCharacters(dream.characters?.join(", ") || "");
-        setNewInterpretation(dream.interpretation || "");
-        setNewType(dream.type || "normal");
-        setNewBeforeSleepMood(dream.beforeSleepMood || "");
-        setNewDreamClarity(dream.dreamClarity || null);
-        setNewDreamScore(dream.dreamScore || null);
-        setNewAudioNote(dream.audioNote || "");
-        setNewPrivate(!!dream.private);
-
-        if (dream.date) {
-          const dreamDate = new Date(dream.date);
-          const dateStr = dreamDate.toISOString().split('T')[0];
-          setNewDate(dateStr);
-        }
-
-        if (dream.sleepTime) {
-          const sleepTimeStr = formatTimeForInput(dream.sleepTime);
-          setNewSleepTime(sleepTimeStr);
-        }
-
-        if (dream.wokeUpTime) {
-          const wokeUpTimeStr = formatTimeForInput(dream.wokeUpTime);
-          setNewWokeUpTime(wokeUpTimeStr);
-        }
-
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching dream:", err);
-        showError("Erreur lors du chargement du rêve : " + (err instanceof Error ? err.message : "Erreur inconnue"));
-        router.push("/");
-      }
-    };
-
     if (id) {
       fetchDream();
     }
-  }, [id, router]);
+  }, [id, fetchDream]);
 
-  // Fonction toggleSection 
+  // Toggle section function 
   const toggleSection = (section: SectionKey): void => {
     setExpandedSections(prev => ({
       ...prev,
@@ -256,7 +257,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
             />
           </div>
 
-          {/* Sleep Time Section avec validation */}
+          {/* Sleep Time Section with validation */}
           <div>
             <label className={labelClass}>Heure de coucher</label>
             <input
@@ -277,7 +278,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
             />
           </div>
 
-          {/* Validation des heures de sommeil */}
+          {/* Sleep time validation */}
           {timeValidation.warnings.length > 0 && (
             <div className="col-span-2">
               <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-3">
