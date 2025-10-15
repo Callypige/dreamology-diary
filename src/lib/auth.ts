@@ -28,6 +28,11 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Utilisateur non trouvé");
           }
 
+          // Check if email is verified
+          if (!user.emailVerified) {
+            throw new Error("EMAIL_NOT_VERIFIED");
+          }
+
           const isValid = await bcrypt.compare(
             credentials.password,
             user.password
@@ -68,7 +73,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "sign-in",
+    signIn: "/auth/sign-in",
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
