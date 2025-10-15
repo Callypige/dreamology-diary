@@ -2,7 +2,7 @@
 
 A dream journal web app to record, revisit, and reflect on dreams — with audio entries, filtering, pagination, and authentication.
 
-**🌐 Live Demo:** [dreamology-tools.netlify.app](https://dreamology-tools.netlify.app)
+**🌐 Live Demo:** [dreamology-tools.netlify.app]dreamologydiary.netlify.app)
 
 🔑 Demo Account
 For recruiters and testers, use these credentials:
