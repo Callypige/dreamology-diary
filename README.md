@@ -45,10 +45,23 @@ npm install
 ### Configure Environment
 Create `.env.local` with:
 ```env
+# Database
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/dreams
-NEXTAUTH_SECRET=yourSecretKey
+
+# Authentication
+NEXTAUTH_SECRET=yourRandomSecretKey
 NEXTAUTH_URL=http://localhost:3000
+
+# Email (SMTP) - Required for user verification & password reset
+EMAIL_SERVER_HOST=smtp.gmail.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=your-email@gmail.com
+EMAIL_SERVER_PASSWORD=your-app-password
+EMAIL_FROM=noreply@dreamology.com
 ```
+
+> **Note:** For Gmail SMTP, enable 2FA and generate an [App Password](https://myaccount.google.com/apppasswords).
+> See `.env.example` for alternative SMTP providers (SendGrid, Mailgun, Amazon SES, etc.)
 
 ### Run Locally
 ```bash
