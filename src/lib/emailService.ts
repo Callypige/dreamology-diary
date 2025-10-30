@@ -13,7 +13,7 @@ const createTransporter = () => {
   };
 
   const missingVars = Object.entries(requiredEnvVars)
-    .filter(([_, value]) => !value)
+    .filter(([_, value]) => value === undefined || value === '')
     .map(([key]) => key);
 
   if (missingVars.length > 0) {
