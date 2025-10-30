@@ -13,7 +13,7 @@ const createTransporter = () => {
   };
 
   const missingVars = Object.entries(requiredEnvVars)
-    .filter(([_, value]) => value === undefined || value === '')
+    .filter(([, value]) => value === undefined || value === '')
     .map(([key]) => key);
 
   if (missingVars.length > 0) {
@@ -37,10 +37,13 @@ const createTransporter = () => {
 };
 
 class EmailService {
-  private transporter;
+  private transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
 
-  constructor() {
-    this.transporter = createTransporter();
+  private getTransporter() {
+    if (!this.transporter) {
+      this.transporter = createTransporter();
+    }
+    return this.transporter;
   }
 
   async sendVerificationEmail(email: string, token: string, username: string) {
@@ -48,7 +51,7 @@ class EmailService {
       const verificationUrl = `${process.env.NEXTAUTH_URL}/auth/verify-email?token=${token}`;
       const template = verificationEmailTemplate({ username, verificationUrl });
 
-      await this.transporter.sendMail({
+      await this.getTransporter().sendMail({
         from: `"Dreamology Tools" <${process.env.EMAIL_FROM}>`,
         to: email,
         subject: template.subject,
@@ -69,7 +72,7 @@ class EmailService {
     try {
       const template = welcomeEmailTemplate({ username });
 
-      await this.transporter.sendMail({
+      await this.getTransporter().sendMail({
         from: `"Dreamology Tools" <${process.env.EMAIL_FROM}>`,
         to: email,
         subject: template.subject,
@@ -91,7 +94,7 @@ class EmailService {
       const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}`;
       const template = passwordResetTemplate({ username, resetUrl });
 
-      await this.transporter.sendMail({
+      await this.getTransporter().sendMail({
         from: `"Dreamology Tools" <${process.env.EMAIL_FROM}>`,
         to: email,
         subject: template.subject,
@@ -110,7 +113,7 @@ class EmailService {
 
   async sendCustomEmail(to: string, subject: string, html: string, text?: string) {
     try {
-      await this.transporter.sendMail({
+      await this.getTransporter().sendMail({
         from: `"Dreamology Tools" <${process.env.EMAIL_FROM}>`,
         to,
         subject,
