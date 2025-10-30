@@ -3,6 +3,25 @@ import { verificationEmailTemplate, welcomeEmailTemplate, passwordResetTemplate 
 
 // Create a reusable transporter object using the default SMTP transport
 const createTransporter = () => {
+  // Validate required environment variables
+  const requiredEnvVars = {
+    EMAIL_SERVER_HOST: process.env.EMAIL_SERVER_HOST,
+    EMAIL_SERVER_PORT: process.env.EMAIL_SERVER_PORT,
+    EMAIL_SERVER_USER: process.env.EMAIL_SERVER_USER,
+    EMAIL_SERVER_PASSWORD: process.env.EMAIL_SERVER_PASSWORD,
+    EMAIL_FROM: process.env.EMAIL_FROM,
+  };
+
+  const missingVars = Object.entries(requiredEnvVars)
+    .filter(([_, value]) => !value)
+    .map(([key]) => key);
+
+  if (missingVars.length > 0) {
+    const errorMsg = `❌ SMTP Configuration Error: Missing required environment variables: ${missingVars.join(', ')}. Please check your .env file and ensure all SMTP settings are configured.`;
+    console.error(errorMsg);
+    throw new Error(errorMsg);
+  }
+
   return nodemailer.createTransport({
     host: process.env.EMAIL_SERVER_HOST,
     port: Number(process.env.EMAIL_SERVER_PORT),
