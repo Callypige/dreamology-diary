@@ -56,8 +56,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
   // Memoize fetchDream function to prevent infinite re-renders
   const fetchDream = useCallback(async (): Promise<void> => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-      const response = await fetch(`${baseUrl}/api/dreams/${id}`, {
+      const response = await fetch(`/api/dreams/${id}`, {
         credentials: "include",
       });
 
@@ -136,9 +135,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
     setIsSubmitting(true);
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
-      const response = await fetch(`${baseUrl}/api/dreams/${id}`, {
+      const response = await fetch(`/api/dreams/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

@@ -33,14 +33,13 @@ export default function Calendar({ onDateSelected }: {
       const firstDay = new Date(year, month, 1);
       const lastDay = new Date(year, month + 1, 0);
       
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
       const params = new URLSearchParams({
         startDate: firstDay.toISOString().split('T')[0],
         endDate: lastDay.toISOString().split('T')[0],
         limit: '100'
       });
 
-      const res = await fetch(`${baseUrl}/api/dreams?${params.toString()}`, {
+      const res = await fetch(`/api/dreams?${params.toString()}`, {
         credentials: "include",
       });
 

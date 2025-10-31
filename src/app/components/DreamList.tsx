@@ -47,7 +47,6 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
       async (page: number = 1) => {
         try {
           setLoading(true);
-          const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
           const params = new URLSearchParams();
 
           // pagination params
@@ -75,7 +74,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
             params.append('date', dateStr);
           }
 
-          const res = await fetch(`${baseUrl}/api/dreams?${params.toString()}`, {
+          const res = await fetch(`/api/dreams?${params.toString()}`, {
             cache: "no-cache",
             credentials: "include",
           });
