@@ -68,7 +68,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
   } catch (error) {
     console.error("Error updating dream:", error);
     return NextResponse.json(
-      { error: "Failed to update dream", details: error instanceof Error ? error.message : "Unknown error" },
+      { error: "Failed to update dream"},
       { status: 500 }
     );
   }
@@ -101,7 +101,7 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
   } catch (error) {
     console.error("Error fetching dream:", error);
     return NextResponse.json(
-      { error: "Failed to fetch dream", details: error instanceof Error ? error.message : "Unknown error" },
+      { error: "Failed to fetch dream" },
       { status: 500 }
     );
   }

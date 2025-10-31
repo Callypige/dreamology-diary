@@ -38,7 +38,7 @@ export default function Navbar() {
                 href="/addDream"
                 className="bg-pink-500 text-white px-6 py-2 rounded-full shadow-md hover:scale-105 transition-transform"
               >
-                + Add Dream
+                + Ajouter un rêve
               </Link>
               <Link
                 href="/profile"
@@ -62,7 +62,7 @@ export default function Navbar() {
                 className="block text-white bg-pink-500 py-2 px-4 rounded-md text-center"
                 onClick={() => setMenuOpen(false)}
               >
-                + Add Dream
+                + Ajouter un rêve
               </Link>
               <Link
                 href="/profile"

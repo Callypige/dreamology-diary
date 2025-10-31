@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching dreams:", error);
     return NextResponse.json(
-      { error: "Failed to fetch dreams", details: error instanceof Error ? error.message : "Unknown error" },
+      { error: "Failed to fetch dreams" },
       { status: 500 }
     );
   }
@@ -142,7 +142,7 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error("Error deleting dream:", error);
     return NextResponse.json(
-      { error: "Failed to delete dream", details: error instanceof Error ? error.message : "Unknown error" },
+      { error: "Failed to delete dream" },
       { status: 500 }
     );
   }
