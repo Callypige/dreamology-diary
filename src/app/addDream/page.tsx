@@ -104,8 +104,7 @@ export default function AddDream() {
     setIsSubmitting(true);
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-      const res = await fetch(`${baseUrl}/api/dreams`, {
+      const res = await fetch("/api/dreams", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

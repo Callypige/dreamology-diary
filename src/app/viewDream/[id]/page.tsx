@@ -47,9 +47,7 @@ export default function DreamDetails() {
   useEffect(() => {
     const fetchDream = async (): Promise<void> => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
-        const res = await fetch(`${baseUrl}/api/dreams/${id}`, {
+        const res = await fetch(`/api/dreams/${id}`, {
           cache: "no-cache",
           credentials: "include",
         });

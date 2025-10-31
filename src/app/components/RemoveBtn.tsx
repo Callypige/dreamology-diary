@@ -18,8 +18,7 @@ export default function RemoveBtn({ id, onDeleted } : RemoveBtnProps) {
         
         if (confirmed) {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"; // Corrigé le port
-                const request = await fetch(`${baseUrl}/api/dreams?id=${id}`, { 
+                const request = await fetch(`/api/dreams?id=${id}`, { 
                     method: "DELETE",
                     credentials: "include", 
                 });
