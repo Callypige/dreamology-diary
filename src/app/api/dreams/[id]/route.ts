@@ -26,67 +26,83 @@ function parseTimeToDate(timeStr: string | undefined, dreamDate: string | undefi
 
 // 📝 PUT - Update a specific dream
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { id } = params;
-  const body = await request.json();
-
-  if (!id || id === 'undefined') {
-    return NextResponse.json({ error: "Invalid dream ID" }, { status: 400 });
-  }
-
-  await connectMongoDB();
-
-  const updateData = {
-    ...body,
-    sleepTime: body.sleepTime ? parseTimeToDate(body.sleepTime, body.date) : undefined,
-    wokeUpTime: body.wokeUpTime ? parseTimeToDate(body.wokeUpTime, body.date) : undefined,
-  };
-
-  Object.keys(updateData).forEach(key => {
-    if (updateData[key] === undefined) {
-      delete updateData[key];
+  try {
+    const params = await props.params;
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-  });
 
-  const updated = await Dream.findOneAndUpdate(
-    { _id: id, user: session.user.id },
-    updateData,
-    { new: true }
-  );
+    const { id } = params;
+    const body = await request.json();
 
-  if (!updated) {
-    return NextResponse.json({ error: "Dream not found or access denied" }, { status: 404 });
+    if (!id || id === 'undefined') {
+      return NextResponse.json({ error: "Invalid dream ID" }, { status: 400 });
+    }
+
+    await connectMongoDB();
+
+    const updateData = {
+      ...body,
+      sleepTime: body.sleepTime ? parseTimeToDate(body.sleepTime, body.date) : undefined,
+      wokeUpTime: body.wokeUpTime ? parseTimeToDate(body.wokeUpTime, body.date) : undefined,
+    };
+
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
+
+    const updated = await Dream.findOneAndUpdate(
+      { _id: id, user: session.user.id },
+      updateData,
+      { new: true }
+    );
+
+    if (!updated) {
+      return NextResponse.json({ error: "Dream not found or access denied" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Dream updated successfully", dream: updated }, { status: 200 });
+  } catch (error) {
+    console.error("Error updating dream:", error);
+    return NextResponse.json(
+      { error: "Failed to update dream", details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({ message: "Dream updated successfully", dream: updated }, { status: 200 });
 }
 
 // 📥 GET - Retrieve a specific dream
 export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const params = await props.params;
+    const { id } = params;
+
+    if (!id || id === 'undefined') {
+      return NextResponse.json({ error: "Invalid dream ID" }, { status: 400 });
+    }
+
+    await connectMongoDB();
+
+    const dream = await Dream.findOne({ _id: id, user: session.user.id });
+
+    if (!dream) {
+      return NextResponse.json({ error: "Dream not found or access denied" }, { status: 404 });
+    }
+
+    return NextResponse.json({ dream }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching dream:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch dream", details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
   }
-
-  const params = await props.params;
-  const { id } = params;
-
-  if (!id || id === 'undefined') {
-    return NextResponse.json({ error: "Invalid dream ID" }, { status: 400 });
-  }
-
-  await connectMongoDB();
-
-  const dream = await Dream.findOne({ _id: id, user: session.user.id });
-
-  if (!dream) {
-    return NextResponse.json({ error: "Dream not found or access denied" }, { status: 404 });
-  }
-
-  return NextResponse.json({ dream }, { status: 200 });
 }
