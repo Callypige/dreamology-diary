@@ -105,7 +105,10 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
     } catch (err) {
       console.error("Error fetching dream:", err);
       showError("Erreur lors du chargement du rêve : " + (err instanceof Error ? err.message : "Erreur inconnue"));
-      router.push("/");
+      setLoading(false);
+      setTimeout(() => {
+        router.push("/");
+      }, 2000);
     }
   }, [id, router, showError]);
 
@@ -184,7 +187,7 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
     }
   };
 
-  const inputClass = "w-full p-3 rounded-xl bg-slate-700 text-white placeholder-gray-400 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500";
+  const inputClass = "w-full p-3 rounded-xl bg-slate-700 text-white placeholder-gray-400 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 relative z-auto cursor-text";
   const labelClass = "font-semibold text-white mb-2 block";
 
   if (loading) {
@@ -198,7 +201,8 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6"
+      className="space-y-6 relative z-10"
+      autoComplete="off"
     >
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-white">✏️ Modifier le rêve</h2>
@@ -210,10 +214,12 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
         <div>
           <label className={labelClass}>Titre du rêve *</label>
           <input
+            type="text"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             className={inputClass}
             placeholder="Titre du rêve"
+            autoComplete="off"
             required
           />
         </div>
@@ -322,10 +328,12 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
               <div>
                 <label className={labelClass}>Humeur dans le rêve</label>
                 <input
+                  type="text"
                   value={newMood}
                   onChange={(e) => setNewMood(e.target.value)}
                   className={inputClass}
                   placeholder="Humeur du rêve"
+                  autoComplete="off"
                 />
               </div>
               <div>
@@ -342,10 +350,12 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
               <div>
                 <label className={labelClass}>Lieu du rêve</label>
                 <input
+                  type="text"
                   value={newLocation}
                   onChange={(e) => setNewLocation(e.target.value)}
                   className={inputClass}
                   placeholder="Lieu du rêve"
+                  autoComplete="off"
                 />
               </div>
               <div>
@@ -363,10 +373,12 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
             <div>
               <label className={labelClass}>Personnages présents</label>
               <input
+                type="text"
                 value={newCharacters}
                 onChange={(e) => setNewCharacters(e.target.value)}
                 className={inputClass}
                 placeholder="Personnages (séparés par des virgules)"
+                autoComplete="off"
               />
             </div>
             <div className="flex items-center gap-3">
@@ -407,10 +419,12 @@ export default function EditDreamForm({ id }: EditDreamFormProps) {
             <div>
               <label className={labelClass}>Tags</label>
               <input
+                type="text"
                 value={newTags}
                 onChange={(e) => setNewTags(e.target.value)}
                 className={inputClass}
                 placeholder="Tags (séparés par des virgules)"
+                autoComplete="off"
               />
               <p className="text-xs text-gray-400 mt-1">Séparés par des virgules</p>
             </div>
