@@ -26,8 +26,7 @@ This account contains sample dream entries to showcase all features.
 ## 🧰 Tech Stack
 - **Frontend:** Next.js 14 (React), Tailwind CSS
 - **Backend:** MongoDB with Mongoose
-- **Authentication:** NextAuth.js  
-- **Audio:** HTML5 Audio / Web Audio API
+- **Authentication:** NextAuth.js
 - **Deployment:** Netlify with automatic CI/CD
 - **PWA:** Service Worker for offline functionality
 
@@ -62,9 +61,6 @@ EMAIL_SERVER_PASSWORD=your-app-password
 EMAIL_FROM=noreply@dreamology.com
 ```
 
-> **Note:** For Gmail SMTP, enable 2FA and generate an [App Password](https://myaccount.google.com/apppasswords).
-> See `.env.example` for alternative SMTP providers (SendGrid, Mailgun, Amazon SES, etc.)
-
 ### Run Locally
 ```bash
 npm run dev
@@ -72,20 +68,9 @@ npm run dev
 Access at: http://localhost:3000
 
 ## 📱 PWA Installation
-
 The app can be installed as a Progressive Web App:
 1. Visit the live site on mobile or desktop
 2. Look for "Install App" or "Add to Home Screen" prompt
 3. Enjoy the native app experience with offline capabilities
-
-## 🗓️ Roadmap
-
-✅ Calendar view for browsing dreams  
-✅ PWA implementation  
-✅ Netlify deployment  
-🔄 **In Progress:** Export as PDF / encrypted archive  
-🔔 **Future:** Push notifications for dream reminders
-
-
 
 *Sweet dreams! 🌙✨*
