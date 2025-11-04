@@ -225,9 +225,15 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
           />
         </>
       ) : (
-        <p className="text-gray-400 text-center text-2xl font-light mt-12">
-          🛌 Aucun rêve correspondant à la recherche
-        </p>
+        <div className="text-gray-400 text-center text-2xl font-light mt-12">
+          <p>🛌 Aucun rêve correspondant à la recherche, voulez vous créer un nouveau rêve ?</p>
+          <Link
+            href="/createDream"
+            className="inline-block mt-4 text-indigo-400 hover:text-indigo-500 transition"
+          >
+            Créer un nouveau rêve
+          </Link>
+        </div>
       )}
     </section>
   );
