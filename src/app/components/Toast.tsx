@@ -1,7 +1,7 @@
 // src/components/ui/Toast.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { TbX, TbCheck, TbExclamationMark, TbInfoCircle } from 'react-icons/tb';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -93,18 +93,18 @@ export function useToast() {
     isVisible: false,
   });
 
-  const showToast = (message: string, type: ToastType = 'info') => {
+  const showToast = useCallback((message: string, type: ToastType = 'info') => {
     setToast({ message, type, isVisible: true });
-  };
+  }, []);
 
-  const hideToast = () => {
+  const hideToast = useCallback(() => {
     setToast(prev => ({ ...prev, isVisible: false }));
-  };
+  }, []);
 
-  const success = (message: string) => showToast(message, 'success');
-  const error = (message: string) => showToast(message, 'error');
-  const warning = (message: string) => showToast(message, 'warning');
-  const info = (message: string) => showToast(message, 'info');
+  const success = useCallback((message: string) => showToast(message, 'success'), [showToast]);
+  const error = useCallback((message: string) => showToast(message, 'error'), [showToast]);
+  const warning = useCallback((message: string) => showToast(message, 'warning'), [showToast]);
+  const info = useCallback((message: string) => showToast(message, 'info'), [showToast]);
 
   return {
     toast,
