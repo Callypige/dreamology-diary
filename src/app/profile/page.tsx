@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import EditNameForm from "./EditNameForm";
-import DreamStat from "../components/profile/Dreamstat";
+import EditNameForm from "@/components/profile/EditNameForm";
+import DreamStat from "@/components/profile/DreamStat";
 
 interface Profile {
   id: string;

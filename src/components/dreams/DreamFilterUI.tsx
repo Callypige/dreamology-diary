@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import DreamList from "./DreamList";
-import Calendar from "./calendar/Calendar";
+import Calendar from "@/components/ui/Calendar";
 import { Dream } from "@/types/Dream";
 
 export default function DreamFilterUI() {

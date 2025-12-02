@@ -4,8 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { HiPencilAlt } from "react-icons/hi";
 import RemoveBtn from "./RemoveBtn";
-import { Dream } from "../../types/Dream";
-import Pagination from "./pagination/pagination";
+import { Dream } from "@/types/Dream";
+import Pagination from "@/components/ui/Pagination";
 
 interface DreamListProps {
   type?: string;
@@ -28,7 +28,7 @@ interface PaginationData {
 
 interface DreamWithMongoId extends Omit<Dream, 'id'> {
   _id: string;
-  id?: string; // Optionnel pour compatibilité
+  id?: string;
 }
 
 export default function DreamList({ type, recurring, dreamScore, mood, tags, hasAudio, selectedDate }: DreamListProps) {
@@ -40,86 +40,79 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
     totalDreams: 0,
     hasNextPage: false,
     hasPreviousPage: false,
-    limit: 10, // Default limit
+    limit: 10,
   });
 
-    const fetchDreams = useCallback(
-      async (page: number = 1) => {
-        try {
-          setLoading(true);
-          const params = new URLSearchParams();
+  const fetchDreams = useCallback(
+    async (page: number = 1) => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
 
-          // pagination params
-          params.append("page", String(page));
-          params.append("limit", "10"); // Default limit
+        params.append("page", String(page));
+        params.append("limit", "10");
 
-          // filter params
-          if (type) params.append("type", type);
-          if (recurring !== undefined) params.append("recurring", String(recurring));
-          if (dreamScore !== undefined && dreamScore > 0) {
-            params.append("dreamScore", String(dreamScore));
-          }
-          if (mood) params.append("mood", mood);
-          if (tags && tags.length > 0 && tags[0]) { 
-            params.append("tag", tags[0]); 
-          }
-          if (hasAudio !== undefined) params.append("hasAudio", String(hasAudio));
-          // date filter
-          if (selectedDate) {
-            const year = selectedDate.getFullYear();
-            const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
-            const day = selectedDate.getDate().toString().padStart(2, '0');
-            const dateStr = `${year}-${month}-${day}`; // "2025-07-15"
-            
-            params.append('date', dateStr);
-          }
-
-          const res = await fetch(`/api/dreams?${params.toString()}`, {
-            cache: "no-cache",
-            credentials: "include",
-          });
-
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
-            setDreams(data.body || data.dreams || []);
-            setPagination(data.pagination || {
-              currentPage: 1,
-              totalPages: 1,
-              totalDreams: 0,
-              hasNextPage: false,
-              hasPreviousPage: false,
-              limit: 10
-          });
-        } catch (err) {
-          console.error("Error fetching dreams:", err);
-        } finally {
-          setLoading(false);
+        if (type) params.append("type", type);
+        if (recurring !== undefined) params.append("recurring", String(recurring));
+        if (dreamScore !== undefined && dreamScore > 0) {
+          params.append("dreamScore", String(dreamScore));
         }
-      },
-      [type, recurring, dreamScore, mood, tags, hasAudio, selectedDate]
-    );
+        if (mood) params.append("mood", mood);
+        if (tags && tags.length > 0 && tags[0]) { 
+          params.append("tag", tags[0]); 
+        }
+        if (hasAudio !== undefined) params.append("hasAudio", String(hasAudio));
+        
+        if (selectedDate) {
+          const year = selectedDate.getFullYear();
+          const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+          const day = selectedDate.getDate().toString().padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
+          params.append('date', dateStr);
+        }
+
+        const res = await fetch(`/api/dreams?${params.toString()}`, {
+          cache: "no-cache",
+          credentials: "include",
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setDreams(data.body || data.dreams || []);
+        setPagination(data.pagination || {
+          currentPage: 1,
+          totalPages: 1,
+          totalDreams: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+          limit: 10
+        });
+      } catch (err) {
+        console.error("Error fetching dreams:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [type, recurring, dreamScore, mood, tags, hasAudio, selectedDate]
+  );
 
   useEffect(() => {
-    fetchDreams(1); // Reset to page 1 on new filters
+    fetchDreams(1);
   }, [fetchDreams]);
 
   const handlePageChange = (page: number) => {
     fetchDreams(page);
-    // Scroll to top on page change
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   const handleDreamDeleted = () => {
-    // Re-fetch dreams after deletion
     fetchDreams(pagination.currentPage);
   }
 
   if (loading) {
     return (
       <>
-        <figure className="flex justify-center mb-8">
-
-        </figure>
+        <figure className="flex justify-center mb-8"></figure>
         <p className="text-center text-white mt-12">Chargement des rêves…</p>
       </>
     );
@@ -127,7 +120,6 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
 
   return (
     <section className="w-full px-8 py-12 min-h-screen">
-      {/* Results summary */}
       {pagination.totalDreams > 0 && (
         <div className="text-center mb-6">
           <p className="text-gray-300">
@@ -149,7 +141,6 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
 
       {dreams.length > 0 ? (
         <>
-          {/* Dreams grid */}
           <div className="flex flex-col gap-6 w-full items-center">
             {dreams.map((dream) => (
               <div
@@ -213,7 +204,6 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
             ))}
           </div>
 
-          {/* Pagination component */}
           <Pagination
             currentPage={pagination.currentPage}
             totalPages={pagination.totalPages}

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TbArrowBackUp, TbChevronDown, TbChevronUp } from "react-icons/tb";
-import VoiceRecorder from "../components/audio/VoiceRecorder";
-import { Toast, useToast } from "../components/Toast";
+import VoiceRecorder from "@/components/audio/VoiceRecorder";
+import { Toast, useToast } from "@/components/ui/Toast";
 
 interface DreamFormData {
   title: string;

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import UserButton from "@/app/components/UserButton";
+import UserButton from "@/components/ui/UserButton";
 import { useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
 

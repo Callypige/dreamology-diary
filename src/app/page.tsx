@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import DreamFilterUI from "./components/DreamFilterUI";
+import DreamFilterUI from "@/components/dreams/DreamFilterUI";
 import { Moon } from "lucide-react"
 
 import { Session } from "next-auth";

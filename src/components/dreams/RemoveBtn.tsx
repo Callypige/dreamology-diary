@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from "next/navigation";
 import { HiOutlineTrash } from "react-icons/hi";
-import { Toast, useToast } from "./Toast";
+import { Toast, useToast } from "@/components/ui/Toast";
 
 
 interface RemoveBtnProps {

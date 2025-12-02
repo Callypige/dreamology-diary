@@ -1,7 +1,7 @@
 // src/app/editDream/[id]/page.tsx
 import Link from "next/link";
 import { TbArrowBackUp } from "react-icons/tb";
-import EditDreamForm from "@/app/components/EditDreamForm";
+import EditDreamForm from "@/components/dreams/EditDreamForm";
 
 interface PageProps {
   params: Promise<{ id: string }>;

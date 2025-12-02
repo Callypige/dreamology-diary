@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { TbChevronDown, TbChevronUp } from "react-icons/tb";
-import VoiceRecorder from "@/app/components/audio/VoiceRecorder";
+import VoiceRecorder from "@/components/audio/VoiceRecorder";
+import { Toast, useToast } from "@/components/ui/Toast";
 import { formatTimeForInput, combineDateTime, validateSleepTimes } from '@/utils/dateTimeUtils';
-import { Toast, useToast } from "@/app/components/Toast";
 
 interface EditDreamFormProps {
   id: string;
