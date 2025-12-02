@@ -151,7 +151,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
                            h-auto max-w-3xl w-full overflow-hidden"
               >
                 <h4>Rêve du {new Date(dream.date).toLocaleDateString("fr-FR")}</h4>
-                <Link href={`/viewDream/${dream._id}`}>
+                <Link href={`/dreams/${dream._id}`}>
                   <h2 className="text-2xl font-bold text-white mb-2 hover:text-indigo-400 transition cursor-pointer line-clamp-1">
                     {dream.title}
                   </h2>
@@ -193,7 +193,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
                   <div className="flex gap-4 items-center">
                     <RemoveBtn id={dream._id} onDeleted={handleDreamDeleted} />
                     <Link
-                      href={`/editDream/${dream._id}`}
+                      href={`/dreams/${dream._id}/edit`}
                       className="text-indigo-400 hover:text-indigo-500 transition"
                     >
                       <HiPencilAlt size={28} />
@@ -218,7 +218,7 @@ export default function DreamList({ type, recurring, dreamScore, mood, tags, has
         <div className="text-gray-400 text-center text-2xl font-light mt-12">
           <p>🛌 Aucun rêve correspondant à la recherche, voulez vous créer un nouveau rêve ?</p>
           <Link
-            href="/createDream"
+            href="/dreams/new"
             className="inline-block mt-4 text-indigo-400 hover:text-indigo-500 transition"
           >
             Créer un nouveau rêve

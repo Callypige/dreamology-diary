@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import EditNameForm from "@/components/profile/EditNameForm";
-import DreamStat from "@/components/profile/DreamStat";
+import ProfileEditForm from "@/components/profile/ProfileEditForm";
+import DreamStats from "@/components/profile/DreamStats";
 
 interface Profile {
   id: string;
@@ -52,7 +52,7 @@ export default function ProfilePage() {
         
         {/* Statistiques */}
         <div className="mb-8">
-          <DreamStat />
+          <DreamStats /> 
         </div>
         
         <hr className="my-8 border-gray-700" />
@@ -76,7 +76,7 @@ export default function ProfilePage() {
               </p>
               <div className="bg-slate-800 shadow rounded-lg p-4 sm:p-6 border border-slate-700">
                 <h3 className="text-lg sm:text-xl font-semibold mb-4 text-white">Informations personnelles</h3>
-                <EditNameForm profile={profile} />
+                <ProfileEditForm profile={profile} />
               </div>
             </>
           )}
