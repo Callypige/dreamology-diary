@@ -18,8 +18,8 @@ function parseTimeToDate(timeStr: string | undefined, dreamDate: string | undefi
   
   const [hours, minutes] = timeStr.split(':').map(Number);
 
-  const baseDate = dreamDate ? new Date(dreamDate + 'T00:00:00') : new Date();
-  baseDate.setHours(hours, minutes, 0, 0);
+  const baseDate = dreamDate ? new Date(dreamDate + 'T00:00:00Z') : new Date();
+  baseDate.setUTCHours(hours, minutes, 0, 0);
   
   return baseDate;
 }

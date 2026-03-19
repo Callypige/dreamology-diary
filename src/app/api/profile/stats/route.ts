@@ -73,14 +73,10 @@ export async function GET() {
                     $ne: null 
                 }
             }},
-            { $addFields: {
-                // Convertir en heure locale (UTC+2 pour la France en été)
-                localSleepTime: { $add: ["$sleepTime", 2 * 60 * 60 * 1000] } // +2h en millisecondes
-            }},
             { $group: { 
                 _id: null, 
-                averageHour: { $avg: { $hour: "$localSleepTime" }},
-                averageMinute: { $avg: { $minute: "$localSleepTime" }},
+                averageHour: { $avg: { $hour: "$sleepTime" }},
+                averageMinute: { $avg: { $minute: "$sleepTime" }},
                 count: { $sum: 1 }
             }}
         ]);
@@ -94,14 +90,10 @@ export async function GET() {
                     $ne: null 
                 }
             }},
-            { $addFields: {
-                // Convertir en heure locale (UTC+2 pour la France en été)
-                localWakeTime: { $add: ["$wokeUpTime", 2 * 60 * 60 * 1000] } // +2h en millisecondes
-            }},
             { $group: { 
                 _id: null, 
-                averageHour: { $avg: { $hour: "$localWakeTime" }},
-                averageMinute: { $avg: { $minute: "$localWakeTime" }},
+                averageHour: { $avg: { $hour: "$wokeUpTime" }},
+                averageMinute: { $avg: { $minute: "$wokeUpTime" }},
                 count: { $sum: 1 }
             }}
         ]);

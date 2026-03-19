@@ -7,8 +7,8 @@ import { authOptions } from "@/lib/auth";
 function toDateFromHHMM(hhmm: string | undefined) {
   if (!hhmm) return undefined;
   const [h, m] = hhmm.split(":").map(Number);
-  const d = new Date();                     
-  d.setHours(h, m, 0, 0);
+  const d = new Date();
+  d.setUTCHours(h, m, 0, 0);
   return d;
 }
 

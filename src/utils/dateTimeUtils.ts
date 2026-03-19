@@ -29,10 +29,10 @@ export const formatDateOnly = (date: string): string => {
 
 export const formatTimeOnly = (date: string): string => {
   try {
-    return new Date(date).toLocaleTimeString("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const d = new Date(date);
+    const hours = d.getUTCHours().toString().padStart(2, '0');
+    const minutes = d.getUTCMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
   } catch {
     return "Heure invalide";
   }
